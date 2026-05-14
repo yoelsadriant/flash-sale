@@ -1,0 +1,91 @@
+name: Stress
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * 1'  # every Monday 02:00 UTC
+
+jobs:
+  stress:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s
+          --health-timeout 1s
+          --health-retries 10
+
+      ddb-local:
+        image: amazon/dynamodb-local:latest
+        ports: ["8000:8000"]
+
+    env:
+      REDIS_HOST: localhost
+      REDIS_PORT: "6379"
+      PURCHASE_QUEUE_URL: http://localhost:9324/000000000000/PurchaseQueue
+      AWS_REGION: ap-southeast-1
+      AWS_ACCESS_KEY_ID: local
+      AWS_SECRET_ACCESS_KEY: local
+      STAGE: local
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start ElasticMQ with config
+        run: |
+          docker run -d --name elasticmq \
+            -p 9324:9324 \
+            -v ${{ github.workspace }}/backend/elasticmq.conf:/opt/elasticmq.conf:ro \
+            softwaremill/elasticmq-native:1.5.7
+          for i in $(seq 1 15); do
+            nc -z localhost 9324 && break
+            sleep 2
+          done
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - run: npm ci
+
+      - name: Bootstrap DynamoDB tables
+        run: npx ts-node scripts/bootstrap.ts
+
+      - name: Build
+        run: npm run build
+
+      - name: Start serverless-offline
+        run: npm run offline &
+        env:
+          AUTH_MODE: local
+
+      - name: Wait for server to be ready
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:4000/health && break
+            echo "waiting... ($i)"
+            sleep 2
+          done
+
+      - name: Seed fresh stock
+        run: npx ts-node scripts/seed.ts --reset
+
+      - name: Run stress test
+        run: npm run stress
+
+      - name: Upload Artillery report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stress-report
+          path: backend/stress-report.json
+          if-no-files-found: ignore

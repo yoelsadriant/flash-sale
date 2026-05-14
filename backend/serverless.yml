@@ -1,0 +1,133 @@
+service: flash-sale
+
+frameworkVersion: '>=3.0.0 <5.0.0'
+
+plugins:
+  - serverless-offline-sqs
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ap-southeast-1
+  stage: ${opt:stage, 'local'}
+  memorySize: 512
+  timeout: 10
+  environment:
+    STAGE: ${self:provider.stage}
+    REDIS_HOST: ${env:REDIS_HOST, 'localhost'}
+    REDIS_PORT: ${env:REDIS_PORT, '6379'}
+    PURCHASE_QUEUE_URL: ${env:PURCHASE_QUEUE_URL, 'http://localhost:9324/000000000000/PurchaseQueue'}
+    PURCHASES_TABLE: ${self:service}-purchases-${self:provider.stage}
+    PRODUCTS_TABLE: ${self:service}-products-${self:provider.stage}
+    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID, 'local-pool'}
+    COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID, 'local-client'}
+    AUTH_MODE: ${env:AUTH_MODE, 'local'}
+    AWS_REGION_LOCAL: ${self:provider.region}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:Query
+            - dynamodb:Scan
+          Resource:
+            - !GetAtt PurchasesTable.Arn
+            - !Sub "${PurchasesTable.Arn}/index/userId-productId-index"
+            - !GetAtt ProductsTable.Arn
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+            - sqs:GetQueueUrl
+          Resource: !GetAtt PurchaseQueue.Arn
+
+functions:
+  api:
+    handler: dist/handler.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+
+  worker:
+    handler: dist/worker.handler
+    timeout: 30
+    reservedConcurrency: 20
+    events:
+      - sqs:
+          arn: !GetAtt PurchaseQueue.Arn
+          batchSize: 10
+          maximumBatchingWindow: 1
+
+custom:
+  serverless-offline:
+    httpPort: 4000
+    noPrependStageInUrl: true
+    useChildProcesses: true
+  serverless-offline-sqs:
+    autoCreate: true
+    apiVersion: '2012-11-05'
+    endpoint: http://localhost:9324
+    region: ${self:provider.region}
+    accessKeyId: local
+    secretAccessKey: local
+    skipCacheInvalidation: false
+
+resources:
+  Resources:
+    PurchaseQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: PurchaseQueue
+        VisibilityTimeout: 60
+        RedrivePolicy:
+          deadLetterTargetArn: !GetAtt PurchaseDLQ.Arn
+          maxReceiveCount: 3
+
+    PurchaseDLQ:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: PurchaseDLQ
+        MessageRetentionPeriod: 1209600
+
+    PurchasesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.PURCHASES_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: purchaseId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: productId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: purchaseId
+            KeyType: HASH
+          - AttributeName: userId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: userId-productId-index
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: productId
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    ProductsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.PRODUCTS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: productId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: productId
+            KeyType: HASH

@@ -1,0 +1,12 @@
+node_modules/
+coverage/
+.serverless/
+.dynamodb/
+dist/
+build/
+.env
+.env.local
+*.log
+stress-report.json
+stress-report.html
+.DS_Store

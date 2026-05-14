@@ -1,0 +1,65 @@
+# Artillery stress test — flash-sale purchase burst.
+#
+# Targets the active product (PROD-SNEAKERS-001) which is always seeded with
+# 30 units in an open sale window. Run `npm run seed -- --reset` first to
+# restore stock between runs.
+#
+# Models the real-world scenario: cold start at sale-open second, then a wall
+# of users hammering POST /products/:id/purchase. Goal is to verify:
+#   1. The system stays responsive under load (p95 latency < 1s).
+#   2. Stock counter never drops below zero (no overselling).
+#   3. Exactly INITIAL_STOCK 202s; the rest get 410 SOLD_OUT cleanly.
+#
+# Run:   npx artillery run tests/stress/flash-sale.yml
+# Verify: curl http://localhost:4000/products | jq '.[] | {id, stock, status}'
+
+config:
+  target: "http://localhost:4000"
+  http:
+    timeout: 10
+    pool: 200
+  phases:
+    - name: "warmup"
+      duration: 5
+      arrivalRate: 5
+    - name: "burst"
+      duration: 30
+      arrivalRate: 50
+      rampTo: 200
+    - name: "cooldown"
+      duration: 10
+      arrivalRate: 10
+  ensure:
+    thresholds:
+      - http.response_time.p95: 1000
+      - http.response_time.p99: 2000
+  processor: "./generate-user.ts"
+
+scenarios:
+  - name: "buy_then_check"
+    weight: 9
+    flow:
+      - function: "setUserId"
+      - post:
+          url: "/products/PROD-SNEAKERS-001/purchase"
+          headers:
+            X-User-Id: "{{ userId }}"
+          # 200 = purchased, 410 = sold out, 409 = already purchased or not active
+          expect:
+            - statusCode: [200, 409, 410]
+      - think: 0.5
+      - get:
+          url: "/products/PROD-SNEAKERS-001/purchase/me"
+          headers:
+            X-User-Id: "{{ userId }}"
+          expect:
+            - statusCode: [200, 404]
+
+  - name: "status_pollers"
+    weight: 1
+    flow:
+      - get:
+          url: "/products"
+          expect:
+            - statusCode: 200
+            - contentType: json

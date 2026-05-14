@@ -1,0 +1,38 @@
+# Local infra for offline development. Brought up by `npm start`.
+#
+# Healthchecks on redis + elasticmq let `docker compose up -d --wait` return
+# only when those services are ready. DDB-local's image has no useful in-container
+# probe, so we don't add one — `scripts/bootstrap.ts` retries until DDB responds,
+# which is more reliable than a Docker-side probe anyway.
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    command: ["redis-server", "--appendonly", "no", "--save", ""]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 1s
+      retries: 10
+      start_period: 2s
+
+  elasticmq:
+    image: softwaremill/elasticmq-native:1.5.7
+    ports: ["9324:9324", "9325:9325"]
+    volumes:
+      - ./elasticmq.conf:/opt/elasticmq.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 9324"]
+      interval: 2s
+      timeout: 1s
+      retries: 15
+      start_period: 3s
+
+  ddb-local:
+    image: amazon/dynamodb-local:latest
+    command: ["-jar", "DynamoDBLocal.jar", "-inMemory", "-sharedDb"]
+    ports: ["8000:8000"]
+    # No healthcheck — bootstrap.ts polls DDB directly with the AWS SDK,
+    # which is a more accurate readiness signal than anything we could
+    # run inside this container.
