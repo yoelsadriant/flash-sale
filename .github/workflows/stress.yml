@@ -2,8 +2,6 @@ name: Stress
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 2 * * 1'  # every Monday 02:00 UTC
 
 jobs:
   stress:
