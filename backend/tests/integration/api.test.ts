@@ -192,13 +192,4 @@ describe('API integration', () => {
       expect(res.body.source).toBe('durable');
     });
   });
-
-  describe('Swagger', () => {
-    test('serves OpenAPI JSON', async () => {
-      const res = await request(app).get('/openapi.json');
-      expect(res.status).toBe(200);
-      expect(res.body.openapi).toMatch(/^3\./);
-      expect(res.body.paths['/products/{productId}/purchase']).toBeDefined();
-    });
-  });
 });

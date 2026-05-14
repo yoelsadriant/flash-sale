@@ -4,7 +4,7 @@ import {
   setUserId,
   clearUserId,
   getAuthHeaders,
-} from './auth';
+} from '../api/auth';
 
 describe('auth helpers', () => {
   beforeEach(() => {

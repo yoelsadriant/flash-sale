@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest';
 import { makeClient, ApiError } from '../api/client';
-import { mkProduct, mkAttempt, mkRecord } from '../test/factories';
+import { mkProduct, mkAttempt, mkRecord } from './factories';
 
 function mockFetch(
   resolutions: Array<{ status: number; body: unknown }>
