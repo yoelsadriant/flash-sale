@@ -46,7 +46,7 @@ Opens on **http://localhost:5173**.
 
 ---
 
-## Try it
+## Endpoint check
 
 ```bash
 # List all products with live status and stock
