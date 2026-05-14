@@ -1,8 +1,10 @@
 # Flash Sale
 
-Flash sale platform with strict correctness guarantees: no overselling, one item per user, purchases only during the configured window.
+Flash sale platform handling high-concurrency purchases — Redis Lua (atomic stock), SQS + Lambda worker (async DDB writes), Express lambdalith on AWS serverless.
 
-**Stack:** Express + Redis (Lua) + DynamoDB Local · React + Vite · Docker for local infra
+Correctness guarantees: no overselling, one item per user, purchases only within the configured sale window.
+
+**Stack:** Express · Redis Lua · SQS · DynamoDB · React + Vite · Serverless Framework · Docker
 
 ---
 
@@ -13,25 +15,26 @@ Flash sale platform with strict correctness guarantees: no overselling, one item
 
 ---
 
-## Run
+## Run locally
 
-### 1. Backend
+### Backend
 
 ```bash
 cd backend
 npm install
-cp .env.example .env
 npm start
 ```
 
-`npm start` does everything in order:
-1. Starts Docker infra (Redis, DynamoDB Local) and waits until healthy
-2. Creates DDB tables and seeds Redis stock counters (`scripts/bootstrap.ts`)
-3. Starts the API on **http://localhost:4000** with hot reload
+`npm start` runs everything in order:
 
-Stop: `Ctrl-C`, then `npm stop` to tear down Docker.
+1. Starts Docker infra (Redis, ElasticMQ, DynamoDB Local) and waits until healthy
+2. Creates DynamoDB tables and seeds products (`scripts/bootstrap.ts`)
+3. Compiles TypeScript to `dist/`
+4. Starts the API + worker on **http://localhost:4000** via serverless-offline
 
-### 2. Frontend
+Stop: `Ctrl-C`, then `npm run stop` to tear down Docker.
+
+### Frontend
 
 ```bash
 cd frontend
@@ -39,59 +42,64 @@ npm install
 npm run dev
 ```
 
-Opens on **http://localhost:5173** — Vite proxies `/api` to `:4000`.
+Opens on **http://localhost:5173**.
 
 ---
 
 ## Try it
 
 ```bash
-# List all products with their current status + stock
-curl http://localhost:4000/products
+# List all products with live status and stock
+curl http://localhost:4000/products | jq .
 
-# Attempt a purchase (X-User-Id is the local auth header)
-curl -X POST http://localhost:4000/products/PROD-SNEAKERS-001/purchase \
-  -H 'X-User-Id: alice' -H 'Content-Type: application/json'
-
-# Check alice's purchase record
-curl http://localhost:4000/products/PROD-SNEAKERS-001/purchase/me \
+# Grab an active product id, then attempt a purchase
+# X-User-Id is the local auth header (replaces JWT in local mode)
+curl -X POST http://localhost:4000/products/<productId>/purchase \
   -H 'X-User-Id: alice'
 
-# Swagger UI
-open http://localhost:4000/docs
+# Check alice's purchase record
+curl http://localhost:4000/products/<productId>/purchase/me \
+  -H 'X-User-Id: alice'
+
+# Health / readiness
+curl http://localhost:4000/health
+curl http://localhost:4000/ready
 ```
 
 ---
 
-## Reset / Reseed
+## Reset between runs
 
 ```bash
 cd backend
 
-# Reset Redis stock counters + clear all DDB purchase records (keeps tables)
+# Reset Redis stock + clear all DDB purchase records (keeps tables and Docker running)
 npm run seed -- --reset
-
-# Initialize stock for the first time without overwriting existing data
-npm run seed
 ```
 
-Useful when you want to start a fresh round of purchasing without tearing Docker down.
+Useful for re-running stress tests or starting a fresh purchase round without tearing down Docker.
 
 ---
 
 ## Tests
 
 ```bash
-# Backend — Jest + ts-jest (unit + integration)
-cd backend && npm test            # 44 tests
+# Backend — Jest (unit + integration)
+cd backend
+npm test
+npm run test:unit
+npm run test:integration
 npm run test:coverage
 
-# Frontend — Vitest + RTL
-cd frontend && npm test
+# Frontend — Vitest + Testing Library
+cd frontend
+npm test
 npm run test:coverage
 
-# Stress test (backend must be running)
-cd backend && npm run stress      # Artillery: ramp to 200 arrivals/sec
+# Stress test — backend must be running and seeded
+cd backend
+npm run seed -- --reset
+npm run stress
 ```
 
 Key correctness test:
@@ -100,19 +108,28 @@ Key correctness test:
 ✓ exactly N winners under burst of 50 concurrent attempts on stock=10
 ```
 
-50 simultaneous requests for 10 units → exactly 10 `PURCHASED`, 40 `SOLD_OUT`, every time. That's the Lua script doing its job.
+50 simultaneous requests against 10 units of stock → exactly 10 `PURCHASED`, 40 `SOLD_OUT`, every time. That's the Redis Lua script holding the invariant.
 
 ---
 
 ## How it works
 
 ```
-Browser → Express API
-              │
-              ├─ Redis Lua script  ← atomic gate: stock decrement + one-per-user
-              │   (reserve or reject, returns immediately)
-              │
-              └─ DynamoDB write    ← async, best-effort durability
+Browser
+  └─► API Lambda (Express + serverless-http)
+        │
+        ├─ 1. Redis Lua script     ← atomic gate
+        │      DECR stock          ← no oversell
+        │      SADD buyers         ← one per user
+        │      returns immediately
+        │
+        ├─ 2. SQS SendMessage      ← decouple from DB write
+        │
+        └─ 3. Worker Lambda        ← drains SQS
+               PutItem (conditional)   ← idempotent
+               ADD stock -1 on ProductsTable
 ```
 
-Redis is the hot path. The Lua script atomically checks stock and the buyers set in one round-trip — no race conditions possible. DynamoDB gets the durable record in the background; `/purchase/me` falls back to Redis while the write is in flight.
+Redis is the hot path. The Lua script atomically checks stock and the buyers set in one round-trip — no race conditions possible. DynamoDB gets the durable record in the background; `GET /products/:id/purchase/me` falls back to Redis while the write is in flight.
+
+See [docs/architecture.md](docs/architecture.md) for full sequence diagrams and schema details.
