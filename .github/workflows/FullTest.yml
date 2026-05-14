@@ -1,9 +1,8 @@
-name: CI
+name: full-test
 
 on:
+  workflow_dispatch:
   push:
-    branches: [main]
-  pull_request:
 
 jobs:
   backend:
@@ -43,7 +42,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
@@ -54,9 +53,14 @@ jobs:
 
       - run: npm run build
 
-      - run: npm run test:unit
+      - run: npm run test
 
-      - run: npm run test:integration
+      - name: Upload backend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage/lcov.info
+          if-no-files-found: warn
 
   frontend:
     runs-on: ubuntu-latest
@@ -69,10 +73,17 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
       - run: npm ci
 
       - run: npm test
+
+      - name: Upload frontend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage/
+          if-no-files-found: warn

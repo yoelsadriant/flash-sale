@@ -1,61 +1,104 @@
-# Artillery stress test — flash-sale purchase burst.
+# Artillery stress test — production-modelled flash sale burst
 #
-# Targets the active product (PROD-SNEAKERS-001) which is always seeded with
-# 30 units in an open sale window. Run `npm run seed -- --reset` first to
-# restore stock between runs.
+# Load model
+# ──────────
+#   pre_sale_browse   30 s @  20 RPS   — anxious users refreshing before the sale opens
+#   opening_spike     10 s @ 300 RPS   — the thundering-herd moment at sale-open second
+#   sustained_race    20 s @ 100→30 RPS — continued buying pressure as stock depletes
+#   tail              15 s @  20 RPS   — stragglers + purchase-status checkers
 #
-# Models the real-world scenario: cold start at sale-open second, then a wall
-# of users hammering POST /products/:id/purchase. Goal is to verify:
-#   1. The system stays responsive under load (p95 latency < 1s).
-#   2. Stock counter never drops below zero (no overselling).
-#   3. Exactly INITIAL_STOCK 202s; the rest get 410 SOLD_OUT cleanly.
+# Scenario mix
+# ────────────
+#   direct_buy     (70 %) — user arrives and immediately hits POST /purchase
+#   browse_then_buy (20 %) — GET /products → short think → POST /purchase → GET /me
+#   status_poll    (10 %) — GET /products only (pre-sale browsers / late arrivals)
 #
-# Run:   npx artillery run tests/stress/flash-sale.yml
-# Verify: curl http://localhost:4000/products | jq '.[] | {id, stock, status}'
+# "Green" criteria  (enforced by --ensure flag — exits non-zero on violation)
+# ────────────────
+#   p95 latency   < 500 ms   (snappy enough that the buy button feels instant)
+#   p99 latency   < 2000 ms  (worst-case spike outliers still under 2 s)
+#   max latency   < 8000 ms  (no request should ever hang > 8 s)
+#
+# After Artillery exits, run `npm run stress:verify` to assert:
+#   • No overselling (remaining stock ≥ 0)
+#   • Conservation   (purchased + remaining === initialStock)
+#   • DDB plausibility (confirmed ≤ purchased)
+#
+# Seed before running:
+#   npm run seed -- --reset
 
 config:
   target: "http://localhost:4000"
   http:
     timeout: 10
-    pool: 200
+    pool: 300
   phases:
-    - name: "warmup"
-      duration: 5
-      arrivalRate: 5
-    - name: "burst"
+    - name: "pre_sale_browse"
       duration: 30
-      arrivalRate: 50
-      rampTo: 200
-    - name: "cooldown"
+      arrivalRate: 20
+
+    - name: "opening_spike"
       duration: 10
-      arrivalRate: 10
+      arrivalRate: 300
+
+    - name: "sustained_race"
+      duration: 20
+      arrivalRate: 100
+      rampTo: 30
+
+    - name: "tail"
+      duration: 15
+      arrivalRate: 20
+
   ensure:
     thresholds:
-      - http.response_time.p95: 1000
+      - http.response_time.p95: 500
       - http.response_time.p99: 2000
+      - http.response_time.max: 8000
+
   processor: "./generate-user.ts"
 
 scenarios:
-  - name: "buy_then_check"
-    weight: 9
+  # 70 % — eager buyers: land directly on the purchase endpoint (no browsing delay)
+  - name: "direct_buy"
+    weight: 7
     flow:
       - function: "setUserId"
       - post:
-          url: "/products/PROD-SNEAKERS-001/purchase"
+          url: "/products/8b7ef307-c469-4ec5-941e-8029bd8e9c53/purchase"
           headers:
             X-User-Id: "{{ userId }}"
-          # 200 = purchased, 410 = sold out, 409 = already purchased or not active
+          # 200 PURCHASED | 409 ALREADY_PURCHASED/NOT_ACTIVE | 410 SOLD_OUT
           expect:
             - statusCode: [200, 409, 410]
-      - think: 0.5
+
+  # 20 % — normal buyers: browse first, then buy, then check result
+  - name: "browse_then_buy"
+    weight: 2
+    flow:
+      - function: "setUserId"
       - get:
-          url: "/products/PROD-SNEAKERS-001/purchase/me"
+          url: "/products"
+          expect:
+            - statusCode: 200
+            - contentType: json
+      - think: 0.5
+      - post:
+          url: "/products/8b7ef307-c469-4ec5-941e-8029bd8e9c53/purchase"
+          headers:
+            X-User-Id: "{{ userId }}"
+          expect:
+            - statusCode: [200, 409, 410]
+      - think: 0.3
+      - get:
+          url: "/products/8b7ef307-c469-4ec5-941e-8029bd8e9c53/purchase/me"
           headers:
             X-User-Id: "{{ userId }}"
           expect:
             - statusCode: [200, 404]
 
-  - name: "status_pollers"
+  # 10 % — status pollers: pre-sale browsers and late arrivals who never buy
+  - name: "status_poll"
     weight: 1
     flow:
       - get:

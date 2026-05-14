@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import type {
+import {
   PurchaseAttemptResult,
   PurchaseRecord,
   PurchaseService,
@@ -8,7 +8,7 @@ import type {
   Ddb,
   Queue,
   Product,
-} from '../interfaces';
+} from '@/types';
 
 /**
  * Per-product purchase service.

@@ -1,13 +1,15 @@
-name: Stress
+name: stress-test
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 2 * * 1'  # every Monday 02:00 UTC
+  workflow_run:
+    workflows: ["full-test"]
+    types: [completed]
 
 jobs:
   stress:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     defaults:
       run:
         working-directory: backend
@@ -51,7 +53,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
@@ -79,7 +81,7 @@ jobs:
       - name: Seed fresh stock
         run: npx ts-node scripts/seed.ts --reset
 
-      - name: Run stress test
+      - name: Run stress test (Artillery + verify + report)
         run: npm run stress
 
       - name: Upload Artillery report

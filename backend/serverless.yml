@@ -20,9 +20,11 @@ provider:
     PURCHASE_QUEUE_URL: ${env:PURCHASE_QUEUE_URL, 'http://localhost:9324/000000000000/PurchaseQueue'}
     PURCHASES_TABLE: ${self:service}-purchases-${self:provider.stage}
     PRODUCTS_TABLE: ${self:service}-products-${self:provider.stage}
+    USERS_TABLE: ${self:service}-users-${self:provider.stage}
     COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID, 'local-pool'}
     COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID, 'local-client'}
-    AUTH_MODE: ${env:AUTH_MODE, 'local'}
+    AUTH_MODE: ${env:AUTH_MODE, 'jwt'}
+    JWT_SECRET: ${env:JWT_SECRET, 'flash-sale-dev-secret-change-in-prod'}
     AWS_REGION_LOCAL: ${self:provider.region}
   iam:
     role:
@@ -37,6 +39,8 @@ provider:
             - !GetAtt PurchasesTable.Arn
             - !Sub "${PurchasesTable.Arn}/index/userId-productId-index"
             - !GetAtt ProductsTable.Arn
+            - !GetAtt UsersTable.Arn
+            - !Sub "${UsersTable.Arn}/index/email-index"
         - Effect: Allow
           Action:
             - sqs:SendMessage
@@ -45,7 +49,7 @@ provider:
 
 functions:
   api:
-    handler: dist/handler.handler
+    handler: dist/src/api/handler.handler
     events:
       - http:
           path: /{proxy+}
@@ -53,7 +57,7 @@ functions:
           cors: true
 
   worker:
-    handler: dist/worker.handler
+    handler: dist/src/worker.handler
     timeout: 30
     reservedConcurrency: 20
     events:
@@ -131,3 +135,24 @@ resources:
         KeySchema:
           - AttributeName: productId
             KeyType: HASH
+
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: email-index
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL

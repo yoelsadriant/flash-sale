@@ -2,7 +2,7 @@ import type { SQSEvent, SQSBatchResponse, SQSRecord } from 'aws-lambda';
 import { loadConfig } from '../config';
 import logger from '../logger';
 import { makeDdb } from '../adapters/ddb';
-import type { PurchaseMessage } from '../interfaces';
+import type { PurchaseMessage } from '@/types';
 
 /**
  * Lambda worker — drains PurchaseQueue and writes durable records to DDB.

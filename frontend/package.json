@@ -3,19 +3,17 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "engines": { "node": ">=22" },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "test": "vitest run",
-    "test:unit": "vitest run src/api",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test": "vitest run --coverage"
   },
   "dependencies": {
+    "motion": "^11.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "motion": "^11.5.4"
+    "react-router-dom": "^7.15.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.5.0",

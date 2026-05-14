@@ -5,15 +5,13 @@ import express, {
   type RequestHandler,
 } from 'express';
 import { z } from 'zod';
-import type { ProductServices, AuthedRequest } from '../../interfaces';
-
-export { type ProductServices } from '../../interfaces';
+import type { ProductContext, AuthedRequest } from '@/types';
 
 export function makeProductRoutes({
   productServices,
   authMiddleware,
 }: {
-  productServices: Map<string, ProductServices>;
+  productServices: Map<string, ProductContext>;
   authMiddleware: RequestHandler;
 }) {
   const router = express.Router();

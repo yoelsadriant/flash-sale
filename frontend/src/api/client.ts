@@ -1,8 +1,10 @@
-import type {
+import {
   Product,
-  PurchaseAttemptResponse,
+  PurchaseAttemptResult,
   UserPurchaseRecord,
-} from '../lib/types';
+  AuthResponse,
+} from '@/types';
+
 
 const BASE = import.meta.env.VITE_API_BASE ?? '/api';
 
@@ -39,7 +41,7 @@ export function makeClient({
         ...(init.headers || {}),
       },
     });
-    if (res.status >= 500 || res.status === 401 || res.status === 403) {
+    if (res.status >= 500) {
       const text = await res.text();
       throw new ApiError(res.status, text || res.statusText);
     }
@@ -52,13 +54,39 @@ export function makeClient({
   }
 
   return {
+    async signup(email: string, password: string): Promise<AuthResponse> {
+      const { body } = await request<AuthResponse>(
+        '/auth/signup',
+        { method: 'POST', body: JSON.stringify({ email, password }) },
+        { acceptStatuses: [201, 409] }
+      );
+      return body;
+    },
+
+    async login(email: string, password: string): Promise<AuthResponse> {
+      const { body } = await request<AuthResponse>(
+        '/auth/login',
+        { method: 'POST', body: JSON.stringify({ email, password }) },
+        { acceptStatuses: [200, 401] }
+      );
+      return body;
+    },
+
+    async loginWithGoogle(): Promise<AuthResponse> {
+      const { body } = await request<AuthResponse>(
+        '/auth/google',
+        { method: 'POST' }
+      );
+      return body;
+    },
+
     async getProducts(): Promise<Product[]> {
       const { body } = await request<Product[]>('/products');
       return body;
     },
 
-    async attemptProductPurchase(productId: string): Promise<PurchaseAttemptResponse> {
-      const { body } = await request<PurchaseAttemptResponse>(
+    async attemptProductPurchase(productId: string): Promise<PurchaseAttemptResult> {
+      const { body } = await request<PurchaseAttemptResult>(
         `/products/${productId}/purchase`,
         { method: 'POST' }
       );

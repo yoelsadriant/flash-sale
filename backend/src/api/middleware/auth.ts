@@ -1,8 +1,9 @@
 import type { Request, Response, NextFunction, RequestHandler } from 'express';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
-import type { Config, AppLogger, AuthedRequest } from '../../interfaces';
+import jwt from 'jsonwebtoken';
+import type { Config, AuthedRequest, AppLogger } from '@/types';
 
-export { type AuthedRequest } from '../../interfaces';
+export { type AuthedRequest } from '@/types';
 
 export function makeAuthMiddleware({
   config,
@@ -12,13 +13,13 @@ export function makeAuthMiddleware({
   logger: AppLogger;
 }): RequestHandler {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let verifier: any = null;
+  let cognitoVerifier: any = null;
   if (
-    config.authMode !== 'local' &&
+    config.authMode === 'cognito' &&
     config.cognito.userPoolId &&
     config.cognito.clientId
   ) {
-    verifier = CognitoJwtVerifier.create({
+    cognitoVerifier = CognitoJwtVerifier.create({
       userPoolId: config.cognito.userPoolId,
       clientId: config.cognito.clientId,
       tokenUse: 'access',
@@ -30,6 +31,7 @@ export function makeAuthMiddleware({
     res: Response,
     next: NextFunction
   ): Promise<void> {
+    // local mode: trust X-User-Id header (for tests/scripts only)
     if (config.authMode === 'local') {
       const userId = req.header('X-User-Id');
       if (!userId) {
@@ -41,21 +43,36 @@ export function makeAuthMiddleware({
       return;
     }
 
-    const auth = req.header('Authorization') || '';
-    const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+    const authHeader = req.header('Authorization') || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
     if (!token) {
       res.status(401).json({ error: 'Missing bearer token' });
       return;
     }
+
+    // jwt mode: verify with our own secret
+    if (config.authMode === 'jwt') {
+      try {
+        const payload = jwt.verify(token, config.jwtSecret) as { sub: string; email: string };
+        (req as AuthedRequest).user = { sub: payload.sub, username: payload.email };
+        next();
+      } catch (err) {
+        logger.warn({ err: (err as Error).message }, 'auth.jwt.verify.failed');
+        res.status(401).json({ error: 'Invalid or expired token' });
+      }
+      return;
+    }
+
+    // cognito mode
     try {
-      const payload = await verifier.verify(token);
+      const payload = await cognitoVerifier.verify(token);
       (req as AuthedRequest).user = {
         sub: payload.sub,
         username: payload.username || payload.sub,
       };
       next();
     } catch (err) {
-      logger.warn({ err: (err as Error).message }, 'auth.verify.failed');
+      logger.warn({ err: (err as Error).message }, 'auth.cognito.verify.failed');
       res.status(401).json({ error: 'Invalid token' });
     }
   };

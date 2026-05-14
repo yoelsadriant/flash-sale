@@ -1,20 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useApi } from '../api/ApiProvider';
-
-export type PurchasePhase =
-  | 'IDLE'
-  | 'ATTEMPTING'
-  | 'PURCHASED'
-  | 'ALREADY_PURCHASED'
-  | 'SOLD_OUT'
-  | 'NOT_ACTIVE'
-  | 'ERROR';
-
-export interface PurchaseState {
-  phase: PurchasePhase;
-  purchaseId?: string;
-  errorMessage?: string;
-}
+import { PurchaseState } from '@/types';
 
 export function useProductPurchase(productId: string, userId: string | null) {
   const client = useApi();

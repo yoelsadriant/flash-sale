@@ -1,5 +1,5 @@
 import type { Redis } from 'ioredis';
-import type { ReserveResult, StockService } from '../interfaces';
+import { StockService, StockReserveResult } from '@/types';
 
 /**
  * stockService — owns the hot-path purchase logic.
@@ -98,7 +98,7 @@ export function makeStockService({
       return (await redis.sismember(buyersKey, userId)) === 1;
     },
 
-    async reserve(userId: string): Promise<ReserveResult> {
+    async reserve(userId: string): Promise<StockReserveResult> {
       const result = (await redis.eval(
         RESERVE_LUA,
         3,

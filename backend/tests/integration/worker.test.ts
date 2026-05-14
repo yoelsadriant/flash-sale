@@ -18,6 +18,7 @@ describe('worker handler idempotency', () => {
   let handler: (event: SQSEvent) => Promise<any>;
 
   beforeAll(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     handler = require('../../src/worker/handler').handler;
   });
 

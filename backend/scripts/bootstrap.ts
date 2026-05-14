@@ -58,6 +58,27 @@ function productsTableSpec(tableName: string): CreateTableCommandInput {
   };
 }
 
+function usersTableSpec(tableName: string): CreateTableCommandInput {
+  return {
+    TableName: tableName,
+    BillingMode: 'PAY_PER_REQUEST',
+    AttributeDefinitions: [
+      { AttributeName: 'userId', AttributeType: 'S' },
+      { AttributeName: 'email',  AttributeType: 'S' },
+    ],
+    KeySchema: [
+      { AttributeName: 'userId', KeyType: 'HASH' },
+    ],
+    GlobalSecondaryIndexes: [
+      {
+        IndexName: 'email-index',
+        KeySchema: [{ AttributeName: 'email', KeyType: 'HASH' }],
+        Projection: { ProjectionType: 'ALL' },
+      },
+    ],
+  };
+}
+
 async function waitFor<T>(
   fn: () => Promise<T>,
   { label, attempts = 30, delayMs = 500 }: { label: string; attempts?: number; delayMs?: number }
@@ -110,6 +131,7 @@ async function main() {
 
   await ensureTable(ddbRaw, purchasesTableSpec(config.ddb.purchasesTable));
   await ensureTable(ddbRaw, productsTableSpec(config.ddb.productsTable));
+  await ensureTable(ddbRaw, usersTableSpec(config.ddb.usersTable));
 
   // 2. Seed product catalog into DDB (idempotent — won't overwrite existing)
   const ddb = makeDdb({ config, logger });

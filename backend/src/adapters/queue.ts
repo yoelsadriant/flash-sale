@@ -1,5 +1,5 @@
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
-import { Config, PurchaseMessage, AppLogger, Queue } from '../interfaces';
+import { Config, PurchaseMessage, Queue, AppLogger } from '@/types';
 
 export function makeQueue({
   config,

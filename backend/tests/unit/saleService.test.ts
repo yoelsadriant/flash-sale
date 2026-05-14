@@ -1,4 +1,20 @@
-import { computeStatus } from '../../src/services/saleService';
+import { computeStatus, makeProductSaleService } from '../../src/services/saleService';
+import { Product, StockService } from '@/types';
+
+const ACTIVE_PRODUCT: Product = {
+  id: 'P1', name: 'Test', description: '', emoji: '🧪',
+  price: 10, originalPrice: 20, stock: 5,
+  saleStart: '2026-01-01T00:00:00Z', saleEnd: '2099-01-01T00:00:00Z',
+};
+
+function mockStockSvc(value: number | null): StockService {
+  return {
+    initialize: jest.fn(), reset: jest.fn(),
+    getStock: jest.fn().mockResolvedValue(value),
+    getPurchasedCount: jest.fn(), hasUserPurchased: jest.fn(),
+    reserve: jest.fn(), release: jest.fn(),
+  } as unknown as StockService;
+}
 
 describe('saleService.computeStatus', () => {
   const start = new Date('2026-01-01T00:00:00Z');
@@ -68,5 +84,29 @@ describe('saleService.computeStatus', () => {
         stock: null,
       })
     ).toBe('active');
+  });
+});
+
+describe('makeProductSaleService.getStatus', () => {
+  test('stock defaults to 0 in snapshot when Redis returns null', async () => {
+    const svc = makeProductSaleService({
+      stockService: mockStockSvc(null),
+      product: ACTIVE_PRODUCT,
+      clock: () => new Date('2027-01-01T00:00:00Z'),
+    });
+    const snap = await svc.getStatus();
+    expect(snap.stock).toBe(0);
+    expect(snap.status).toBe('active');
+  });
+
+  test('snapshot carries correct product fields and serverTime', async () => {
+    const now = new Date('2027-06-01T12:00:00Z');
+    const svc = makeProductSaleService({ stockService: mockStockSvc(3), product: ACTIVE_PRODUCT, clock: () => now });
+    const snap = await svc.getStatus();
+    expect(snap.productId).toBe('P1');
+    expect(snap.stock).toBe(3);
+    expect(snap.initialStock).toBe(5);
+    expect(snap.serverTime).toBe(now.toISOString());
+    expect(snap.status).toBe('active');
   });
 });

@@ -1,5 +1,5 @@
 import Redis from 'ioredis';
-import type { Config, AppLogger } from '../interfaces';
+import type { Config, AppLogger } from '@/types';
 
 export function makeRedis({
   config,

@@ -1,4 +1,4 @@
-import { Product } from './interfaces';
+import { Product } from '@/types';
 
 function ts(offsetMs: number): string {
   return new Date(Date.now() + offsetMs).toISOString();

@@ -1,6 +1,6 @@
 import type { Redis } from 'ioredis';
 import RedisMock from 'ioredis-mock';
-import { StockService } from '../../src/interfaces';
+import { StockService } from '@/types';
 import { makeStockService } from '../../src/services/stockService';
 
 describe('stockService', () => {
@@ -81,5 +81,27 @@ describe('stockService', () => {
     await stock.reserve('a');
     await stock.reserve('b');
     expect(await stock.getPurchasedCount()).toBe(2);
+  });
+
+  test('getStock returns null when key has never been initialized', async () => {
+    const fresh = new RedisMock() as unknown as Redis;
+    const s = makeStockService({ redis: fresh, saleId: 'UNSET' });
+    expect(await s.getStock()).toBeNull();
+    await fresh.quit();
+  });
+
+  test('getPurchasedCount returns 0 when key has never been initialized', async () => {
+    const fresh = new RedisMock() as unknown as Redis;
+    const s = makeStockService({ redis: fresh, saleId: 'UNSET2' });
+    expect(await s.getPurchasedCount()).toBe(0);
+    await fresh.quit();
+  });
+
+  test('throws on unexpected Lua return value from reserve', async () => {
+    const badRedis = new RedisMock() as unknown as Redis;
+    (badRedis as unknown as Record<string, unknown>).eval = jest.fn().mockResolvedValue(99);
+    const s = makeStockService({ redis: badRedis, saleId: 'BAD' });
+    await expect(s.reserve('user')).rejects.toThrow('Unexpected reserve result: 99');
+    await badRedis.quit();
   });
 });

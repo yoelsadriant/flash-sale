@@ -3,7 +3,7 @@ import type { Redis } from 'ioredis';
 import { makeStockService } from '../../src/services/stockService';
 import { makeProductSaleService } from '../../src/services/saleService';
 import { makeProductPurchaseService } from '../../src/services/purchaseService';
-import { PurchaseRecord, PurchaseMessage, Ddb, Queue, Product, StockService } from '../../src/interfaces';
+import { PurchaseRecord, PurchaseMessage, Ddb, Queue, Product, StockService } from '@/types';
 
 const ACTIVE_PRODUCT: Product = {
   id: 'PROD-1',
@@ -46,6 +46,9 @@ function makeFakeDdb(purchases = new Map<string, PurchaseRecord>()): Ddb {
     getPurchaseByUser: jest.fn(async (u: string, p: string) =>
       purchases.get(`${u}#${p}`) || null
     ),
+    createUser: jest.fn(async () => ({ created: true })),
+    getUserByEmail: jest.fn(async () => null),
+    getUserById: jest.fn(async () => null),
   };
 }
 

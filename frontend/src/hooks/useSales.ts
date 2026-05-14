@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useApi } from '../api/ApiProvider';
-import type { Product } from '../lib/types';
+import { Product } from '@/types';
 
 export function useSales() {
   const client = useApi();
