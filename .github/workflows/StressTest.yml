@@ -1,4 +1,4 @@
-name: Stress
+name: stress test
 
 on:
   workflow_dispatch:
