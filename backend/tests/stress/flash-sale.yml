@@ -1,6 +1,6 @@
 # Artillery stress test — flash-sale purchase burst.
 #
-# Targets the active product (PROD-SNEAKERS-001) which is always seeded with
+# Targets the active product — Nike Air Max 2026 (8b7ef307-c469-4ec5-941e-8029bd8e9c53) — seeded with
 # 30 units in an open sale window. Run `npm run seed -- --reset` first to
 # restore stock between runs.
 #
@@ -41,7 +41,7 @@ scenarios:
     flow:
       - function: "setUserId"
       - post:
-          url: "/products/PROD-SNEAKERS-001/purchase"
+          url: "/products/8b7ef307-c469-4ec5-941e-8029bd8e9c53/purchase"
           headers:
             X-User-Id: "{{ userId }}"
           # 200 = purchased, 410 = sold out, 409 = already purchased or not active
@@ -49,7 +49,7 @@ scenarios:
             - statusCode: [200, 409, 410]
       - think: 0.5
       - get:
-          url: "/products/PROD-SNEAKERS-001/purchase/me"
+          url: "/products/8b7ef307-c469-4ec5-941e-8029bd8e9c53/purchase/me"
           headers:
             X-User-Id: "{{ userId }}"
           expect:

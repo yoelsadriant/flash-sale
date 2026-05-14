@@ -25,6 +25,8 @@ npm install
 npm start
 ```
 
+> No `.env` needed — all local defaults are baked into the config. Copy `.env.example` to `.env` only if you need to override a value.
+
 `npm start` runs everything in order:
 
 1. Starts Docker infra (Redis, ElasticMQ, DynamoDB Local) and waits until healthy
