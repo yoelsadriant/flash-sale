@@ -85,6 +85,7 @@ Useful for re-running stress tests or starting a fresh purchase round without te
 
 ```bash
 # Backend — Jest (unit + integration)
+Can test from https://github.com/yoelsadriant/flash-sale/actions/workflows/FullTest.yml
 cd backend
 npm test
 npm run test:unit
@@ -97,6 +98,7 @@ npm test
 npm run test:coverage
 
 # Stress test — backend must be running and seeded
+Can test from https://github.com/yoelsadriant/flash-sale/actions/workflows/StressTest.yml
 cd backend
 npm run seed -- --reset
 npm run stress
