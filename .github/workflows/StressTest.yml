@@ -1,9 +1,9 @@
-name: stress test
+name: stress-test
 
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["full test"]
+    workflows: ["full-test"]
     types: [completed]
 
 jobs:
