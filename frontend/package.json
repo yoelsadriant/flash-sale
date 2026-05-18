@@ -7,10 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "test": "vitest run",
-    "test:unit": "vitest run src/api",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test": "vitest run --coverage"
   },
   "dependencies": {
     "motion": "^11.5.4",

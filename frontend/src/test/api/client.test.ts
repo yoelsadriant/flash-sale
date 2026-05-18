@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest';
-import { makeClient, ApiError } from '../api/client';
-import { mkProduct, mkAttempt, mkRecord } from './factories';
+import { makeClient, ApiError } from '../../api/client';
+import { mkProduct, mkAttempt, mkRecord } from '../support/factories';
 
 function mockFetch(
   resolutions: Array<{ status: number; body: unknown }>
@@ -83,6 +83,28 @@ describe('API client', () => {
       fetchImpl: mockFetch([{ status: 401, body: { error: 'no token' } }]),
     });
     await expect(client.attemptProductPurchase('PROD-1')).rejects.toBeInstanceOf(ApiError);
+  });
+
+  test('signup returns AuthResponse on 201', async () => {
+    const auth = { token: 'tok', user: { id: 'u1', email: 'a@a.com' } };
+    const client = makeClient({ baseUrl: '/x', fetchImpl: mockFetch([{ status: 201, body: auth }]) });
+    const r = await client.signup('a@a.com', 'password123');
+    expect(r.token).toBe('tok');
+    expect(r.user.email).toBe('a@a.com');
+  });
+
+  test('login returns AuthResponse on 200', async () => {
+    const auth = { token: 'tok2', user: { id: 'u1', email: 'a@a.com' } };
+    const client = makeClient({ baseUrl: '/x', fetchImpl: mockFetch([{ status: 200, body: auth }]) });
+    const r = await client.login('a@a.com', 'pass');
+    expect(r.token).toBe('tok2');
+  });
+
+  test('loginWithGoogle returns AuthResponse on 200', async () => {
+    const auth = { token: 'google-tok', user: { id: 'g1', email: 'demo@google.com' } };
+    const client = makeClient({ baseUrl: '/x', fetchImpl: mockFetch([{ status: 200, body: auth }]) });
+    const r = await client.loginWithGoogle();
+    expect(r.token).toBe('google-tok');
   });
 
   test('sends auth headers from authHeaders()', async () => {

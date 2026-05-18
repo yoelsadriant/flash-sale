@@ -2,10 +2,14 @@ name: stress test
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["full test"]
+    types: [completed]
 
 jobs:
   stress:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     defaults:
       run:
         working-directory: backend

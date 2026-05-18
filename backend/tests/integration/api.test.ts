@@ -17,6 +17,18 @@ const TEST_PRODUCT: Product = {
   saleEnd: '2099-01-01T00:00:00Z',
 };
 
+const UPCOMING_PRODUCT: Product = {
+  id: 'PROD-UPCOMING',
+  name: 'Upcoming Widget',
+  description: '',
+  emoji: '🚀',
+  price: 29.99,
+  originalPrice: 59.99,
+  stock: 5,
+  saleStart: '2099-01-01T00:00:00Z',
+  saleEnd: '2099-12-31T00:00:00Z',
+};
+
 function makeFakeQueue(): Queue & { sent: PurchaseMessage[] } {
   const sent: PurchaseMessage[] = [];
   return {
@@ -73,10 +85,10 @@ describe('API integration', () => {
     redis = new RedisMock() as unknown as Redis;
     ddb   = makeFakeDdb();
     queue = makeFakeQueue();
-    app   = buildApp({ config, deps: { redis, ddb, queue }, products: [TEST_PRODUCT] });
+    app   = buildApp({ config, deps: { redis, ddb, queue }, products: [TEST_PRODUCT, UPCOMING_PRODUCT] });
     // reset() sets stock AND clears the buyers set — prevents state leaking between tests
-    const stock = makeStockService({ redis, saleId: TEST_PRODUCT.id });
-    await stock.reset(5);
+    await makeStockService({ redis, saleId: TEST_PRODUCT.id }).reset(5);
+    await makeStockService({ redis, saleId: UPCOMING_PRODUCT.id }).reset(5);
   });
 
   afterEach(async () => {
@@ -92,13 +104,15 @@ describe('API integration', () => {
   });
 
   describe('GET /products', () => {
-    test('returns product list with status', async () => {
+    test('returns all products with their current status', async () => {
       const res = await request(app).get('/products');
       expect(res.status).toBe(200);
-      expect(res.body).toHaveLength(1);
-      expect(res.body[0].id).toBe('PROD-TEST-001');
-      expect(res.body[0].status).toBe('active');
-      expect(res.body[0].stock).toBe(5);
+      expect(res.body).toHaveLength(2);
+      const active = res.body.find((p: { id: string }) => p.id === 'PROD-TEST-001');
+      const upcoming = res.body.find((p: { id: string }) => p.id === 'PROD-UPCOMING');
+      expect(active.status).toBe('active');
+      expect(active.stock).toBe(5);
+      expect(upcoming.status).toBe('upcoming');
     });
 
     test('shows sold_out when stock is 0', async () => {
@@ -148,6 +162,15 @@ describe('API integration', () => {
       const res = await request(app).post('/products/PROD-TEST-001/purchase').set('X-User-Id', 'bob');
       expect(res.status).toBe(410);
       expect(res.body.status).toBe('SOLD_OUT');
+    });
+
+    test('409 NOT_ACTIVE (upcoming) when sale has not started yet', async () => {
+      const res = await request(app)
+        .post('/products/PROD-UPCOMING/purchase')
+        .set('X-User-Id', 'alice');
+      expect(res.status).toBe(409);
+      expect(res.body.status).toBe('NOT_ACTIVE');
+      expect(res.body.reason).toBe('upcoming');
     });
 
     test('exactly N winners under burst of 50 concurrent attempts on stock=10', async () => {

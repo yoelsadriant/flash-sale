@@ -3,8 +3,8 @@ import {
   Product,
   PurchaseAttemptResult,
   UserPurchaseRecord,
-} from '../interfaces';
-import { ApiClient } from '../api/client';
+} from '../../interfaces';
+import { ApiClient } from '../../api/client';
 import { vi } from 'vitest';
 
 export function mkSaleSnapshot(over: Partial<SaleSnapshot> = {}): SaleSnapshot {
@@ -59,8 +59,13 @@ export function mkRecord(
   };
 }
 
+const DEMO_AUTH = { token: 'tok', user: { id: 'u1', email: 'demo@example.com' } };
+
 export function makeFakeClient(overrides: Partial<ApiClient> = {}): ApiClient {
   return {
+    signup: vi.fn(async () => DEMO_AUTH),
+    login: vi.fn(async () => DEMO_AUTH),
+    loginWithGoogle: vi.fn(async () => DEMO_AUTH),
     getProducts: vi.fn(async () => [mkProduct()]),
     attemptProductPurchase: vi.fn(async () => mkAttempt()),
     getProductPurchase: vi.fn(async () => null),
