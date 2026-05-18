@@ -46,6 +46,9 @@ function makeFakeDdb(purchases = new Map<string, PurchaseRecord>()): Ddb {
     getPurchaseByUser: jest.fn(async (u: string, p: string) =>
       purchases.get(`${u}#${p}`) || null
     ),
+    createUser: jest.fn(async () => ({ created: true })),
+    getUserByEmail: jest.fn(async () => null),
+    getUserById: jest.fn(async () => null),
   };
 }
 

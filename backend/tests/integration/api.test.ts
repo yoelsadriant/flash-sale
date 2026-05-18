@@ -3,7 +3,7 @@ import RedisMock from 'ioredis-mock';
 import type { Redis } from 'ioredis';
 import { buildApp, type AppWithDeps } from '../../src/api/app';
 import { makeStockService } from '../../src/services/stockService';
-import type { Config, PurchaseRecord, PurchaseMessage, Ddb, Queue, Product } from '../../src/interfaces';
+import { Config, PurchaseRecord, PurchaseMessage, Ddb, Queue, Product } from '../../src/interfaces';
 
 const TEST_PRODUCT: Product = {
   id: 'PROD-TEST-001',
@@ -46,6 +46,9 @@ function makeFakeDdb(): Ddb & { purchases: Map<string, PurchaseRecord> } {
       purchases.get(`${u}#${p}`) || null
     ),
     decrementProductStock: jest.fn(async () => {}),
+    createUser: jest.fn(async () => ({ created: true })),
+    getUserByEmail: jest.fn(async () => null),
+    getUserById: jest.fn(async () => null),
   };
 }
 
@@ -53,9 +56,10 @@ const config: Config = {
   stage: 'test',
   authMode: 'local',
   region: 'ap-southeast-1',
+  jwtSecret: 'test-secret',
   redis: { host: 'localhost', port: 6379 },
   sqs: { queueUrl: 'http://test', endpoint: 'http://test' },
-  ddb: { endpoint: 'http://test', purchasesTable: 't', productsTable: 'p' },
+  ddb: { endpoint: 'http://test', purchasesTable: 't', productsTable: 'p', usersTable: 'u' },
   cognito: {},
 };
 

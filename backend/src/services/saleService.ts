@@ -1,4 +1,4 @@
-import type { SaleStatus, SaleStatusName, SaleService, StockService, Product } from '../interfaces';
+import { SaleSnapshot, SalePhase, SaleService, StockService, Product } from '../interfaces';
 
 export function computeStatus({
   now,
@@ -10,7 +10,7 @@ export function computeStatus({
   saleStart: Date;
   saleEnd: Date;
   stock: number | null;
-}): SaleStatusName {
+}): SalePhase {
   if (now < saleStart) return 'upcoming';
   if (now > saleEnd) return 'ended';
   if (stock !== null && stock <= 0) return 'sold_out';
@@ -27,7 +27,7 @@ export function makeProductSaleService({
   clock?: () => Date;
 }): SaleService {
   return {
-    async getStatus(): Promise<SaleStatus> {
+    async getStatus(): Promise<SaleSnapshot> {
       const now = clock();
       const stock = await stockService.getStock();
       const status = computeStatus({

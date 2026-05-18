@@ -1,13 +1,13 @@
-import type {
-  SaleStatus,
+import {
+  SaleSnapshot,
   Product,
-  PurchaseAttemptResponse,
+  PurchaseAttemptResult,
   UserPurchaseRecord,
-} from '../lib/types';
-import type { ApiClient } from '../api/client';
+} from '../interfaces';
+import { ApiClient } from '../api/client';
 import { vi } from 'vitest';
 
-export function mkSaleStatus(over: Partial<SaleStatus> = {}): SaleStatus {
+export function mkSaleSnapshot(over: Partial<SaleSnapshot> = {}): SaleSnapshot {
   return {
     productId: 'PROD-1',
     status: 'active',
@@ -22,7 +22,7 @@ export function mkSaleStatus(over: Partial<SaleStatus> = {}): SaleStatus {
 
 export function mkProduct(over: Partial<Product> = {}): Product {
   return {
-    ...mkSaleStatus(),
+    ...mkSaleSnapshot(),
     id: 'PROD-1',
     name: 'Test Product',
     description: 'A test product',
@@ -34,14 +34,14 @@ export function mkProduct(over: Partial<Product> = {}): Product {
 }
 
 export function mkAttempt(
-  over: Partial<PurchaseAttemptResponse> = {}
-): PurchaseAttemptResponse {
+  over: Partial<PurchaseAttemptResult> = {}
+): PurchaseAttemptResult {
   return {
     status: 'PURCHASED',
     purchaseId: 'purchase-1',
     userId: 'user-1',
     productId: 'PROD-1',
-    sale: mkSaleStatus(),
+    sale: mkSaleSnapshot(),
     ...over,
   };
 }

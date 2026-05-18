@@ -7,7 +7,7 @@ import { makeDdb } from '../adapters/ddb';
 import { makeQueue } from '../adapters/queue';
 import { makeRedis } from '../adapters/redis';
 import { loadConfig } from '../config';
-import { AppDeps, AppWithDeps, Config, Product, ProductServices } from '../interfaces';
+import { AppDeps, AppWithDeps, Config, Product, ProductContext } from '../interfaces';
 import logger from '../logger';
 import { mockProducts } from '../products';
 import { makeProductPurchaseService } from '../services/purchaseService';
@@ -15,6 +15,8 @@ import { makeProductSaleService } from '../services/saleService';
 import { makeStockService } from '../services/stockService';
 import { makeAuthMiddleware } from './middleware/auth';
 import { makeProductRoutes } from './routes/products';
+import { makeAuthRoutes } from './routes/auth';
+import { makeUserService } from '../services/userService';
 
 export type { AppDeps, AppWithDeps } from '../interfaces';
 
@@ -33,7 +35,7 @@ export function buildApp({
   const queue = deps?.queue  || makeQueue({ config, logger });
   const products = productsOverride ?? mockProducts;
 
-  const productServices = new Map<string, ProductServices>();
+  const productServices = new Map<string, ProductContext>();
   for (const product of products) {
     const stockService   = makeStockService({ redis, saleId: product.id });
     const saleService    = makeProductSaleService({ stockService, product });
@@ -42,6 +44,7 @@ export function buildApp({
   }
 
   const authMiddleware = makeAuthMiddleware({ config, logger });
+  const userService = makeUserService({ ddb, config, logger });
 
   const app = express() as AppWithDeps;
   app.disable('x-powered-by');
@@ -56,6 +59,7 @@ export function buildApp({
     catch (err) { res.status(503).json({ ok: false, err: (err as Error).message }); }
   });
 
+  app.use('/auth', makeAuthRoutes({ userService }));
   app.use('/products', makeProductRoutes({ productServices, authMiddleware }));
 
   app.use((req, res) => res.status(404).json({ error: 'Not found', path: req.path }));

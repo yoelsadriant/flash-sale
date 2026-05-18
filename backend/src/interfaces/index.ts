@@ -16,8 +16,7 @@ export interface Product {
   saleEnd: string;
 }
 
-/** Shape of a product record as stored in DynamoDB (productId as partition key). */
-export interface StoredProduct {
+export interface ProductRecord {
   productId: string;
   name: string;
   description: string;
@@ -29,13 +28,13 @@ export interface StoredProduct {
   saleEnd: string;
 }
 
-// ─── Sale ────────────────────────────────────────────────────────────────────
+// ─── Sale ─────────────────────────────────────────────────────────────────────
 
-export type SaleStatusName = 'upcoming' | 'active' | 'sold_out' | 'ended';
+export type SalePhase = 'upcoming' | 'active' | 'sold_out' | 'ended';
 
-export interface SaleStatus {
+export interface SaleSnapshot {
   productId: string;
-  status: SaleStatusName;
+  status: SalePhase;
   stock: number;
   initialStock: number;
   saleStart: string;
@@ -44,12 +43,12 @@ export interface SaleStatus {
 }
 
 export interface SaleService {
-  getStatus(): Promise<SaleStatus>;
+  getStatus(): Promise<SaleSnapshot>;
 }
 
-// ─── Stock ───────────────────────────────────────────────────────────────────
+// ─── Stock ────────────────────────────────────────────────────────────────────
 
-export type ReserveResult = 'reserved' | 'sold_out' | 'already_purchased';
+export type StockReserveResult = 'reserved' | 'sold_out' | 'already_purchased';
 
 export interface StockService {
   initialize(stock: number): Promise<boolean>;
@@ -57,25 +56,25 @@ export interface StockService {
   getStock(): Promise<number | null>;
   getPurchasedCount(): Promise<number>;
   hasUserPurchased(userId: string): Promise<boolean>;
-  reserve(userId: string): Promise<ReserveResult>;
+  reserve(userId: string): Promise<StockReserveResult>;
   release(userId: string): Promise<boolean>;
 }
 
 // ─── Purchase ─────────────────────────────────────────────────────────────────
 
-export type PurchaseAttemptStatus =
+export type PurchaseAttemptOutcome =
   | 'PURCHASED'
   | 'ALREADY_PURCHASED'
   | 'SOLD_OUT'
   | 'NOT_ACTIVE';
 
 export interface PurchaseAttemptResult {
-  status: PurchaseAttemptStatus;
+  status: PurchaseAttemptOutcome;
   reason?: 'upcoming' | 'ended';
   purchaseId?: string;
   userId?: string;
   productId?: string;
-  sale: SaleStatus;
+  sale: SaleSnapshot;
 }
 
 export interface PurchaseMessage {
@@ -99,6 +98,44 @@ export interface PurchaseService {
   getUserPurchase(userId: string): Promise<PurchaseRecord | null>;
 }
 
+// ─── User ─────────────────────────────────────────────────────────────────────
+
+export interface UserRecord {
+  userId: string;
+  email: string;
+  passwordHash: string;
+  createdAt: string;
+  provider?: 'local' | 'google';
+}
+
+export interface PublicUser {
+  id: string;
+  email: string;
+  createdAt: string;
+}
+
+export interface JwtPayload {
+  sub: string;
+  email: string;
+  iat: number;
+  exp: number;
+}
+
+export type SignupResult =
+  | { ok: true; token: string; user: PublicUser }
+  | { ok: false; reason: 'email_taken' | 'invalid_input' };
+
+export type LoginResult =
+  | { ok: true; token: string; user: PublicUser }
+  | { ok: false; reason: 'invalid_credentials' };
+
+export interface UserService {
+  signup(input: { email: string; password: string; provider?: 'local' | 'google' }): Promise<SignupResult>;
+  login(input: { email: string; password: string }): Promise<LoginResult>;
+  loginWithGoogle(input: { email: string }): Promise<LoginResult>;
+  verifyToken(token: string): Promise<JwtPayload | null>;
+}
+
 // ─── Adapters ─────────────────────────────────────────────────────────────────
 
 export interface DdbWriteResult {
@@ -108,8 +145,8 @@ export interface DdbWriteResult {
 
 export interface Ddb {
   putProduct(product: Product, opts?: { overwrite?: boolean }): Promise<void>;
-  getProduct(productId: string): Promise<StoredProduct | null>;
-  listProducts(): Promise<StoredProduct[]>;
+  getProduct(productId: string): Promise<ProductRecord | null>;
+  listProducts(): Promise<ProductRecord[]>;
   writePurchase(input: {
     userId: string;
     productId: string;
@@ -118,6 +155,9 @@ export interface Ddb {
   }): Promise<DdbWriteResult>;
   getPurchaseByUser(userId: string, productId: string): Promise<PurchaseRecord | null>;
   decrementProductStock(productId: string): Promise<void>;
+  createUser(user: UserRecord): Promise<{ created: boolean; reason?: 'duplicate_email' }>;
+  getUserByEmail(email: string): Promise<UserRecord | null>;
+  getUserById(userId: string): Promise<UserRecord | null>;
 }
 
 export interface Queue {
@@ -130,15 +170,16 @@ export interface Config {
   stage: string;
   authMode: string;
   region: string;
+  jwtSecret: string;
   redis: { host: string; port: number };
   sqs: { queueUrl: string; endpoint?: string };
-  ddb: { endpoint?: string; purchasesTable: string; productsTable: string };
+  ddb: { endpoint?: string; purchasesTable: string; productsTable: string; usersTable: string };
   cognito: { userPoolId?: string; clientId?: string };
 }
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 
-export interface ProductServices {
+export interface ProductContext {
   product: Product;
   saleService: SaleService;
   purchaseService: PurchaseService;

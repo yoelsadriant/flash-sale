@@ -1,8 +1,6 @@
 # Flash Sale
 
-Flash sale platform handling high-concurrency purchases — Redis Lua (atomic stock), SQS + Lambda worker (async DDB writes), Express lambdalith on AWS serverless.
-
-Correctness guarantees: no overselling, one item per user, purchases only within the configured sale window.
+High-concurrency flash sale platform. Redis Lua scripts gate stock atomically (no overselling, one purchase per user per item). SQS + Lambda worker writes durable records to DynamoDB asynchronously. React frontend with JWT auth.
 
 **Stack:** Express · Redis Lua · SQS · DynamoDB · React + Vite · Serverless Framework · Docker
 
@@ -25,9 +23,7 @@ npm install
 npm start
 ```
 
-> No `.env` needed — all local defaults are baked into the config. Copy `.env.example` to `.env` only if you need to override a value.
-
-`npm start` runs everything in order:
+`npm start` runs in order:
 
 1. Starts Docker infra (Redis, ElasticMQ, DynamoDB Local) and waits until healthy
 2. Creates DynamoDB tables and seeds products (`scripts/bootstrap.ts`)
@@ -44,24 +40,44 @@ npm install
 npm run dev
 ```
 
-Opens on **http://localhost:5173**.
+Opens on **http://localhost:5173**. Sign up with an email and password (or use the Google demo button), then browse and purchase flash sale items.
+
+---
+
+## Auth
+
+The API uses JWT bearer tokens issued by `POST /auth/signup` and `POST /auth/login`. Tokens are signed with `JWT_SECRET` (HS256, 24h expiry) and verified on every protected route.
+
+```bash
+# Sign up
+curl -X POST http://localhost:4000/auth/signup \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com","password":"secret123"}'
+# → { "token": "eyJ...", "user": { "id": "...", "email": "..." } }
+
+# Sign in
+curl -X POST http://localhost:4000/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com","password":"secret123"}'
+```
+
+Users are stored in `UsersTable` (DynamoDB). Passwords are hashed with bcrypt (cost 12).
 
 ---
 
 ## Endpoint check
 
 ```bash
-# List all products with live status and stock
+# List all products with live sale phase and stock
 curl http://localhost:4000/products | jq .
 
-# Grab an active product id, then attempt a purchase
-# X-User-Id is the local auth header (replaces JWT in local mode)
+# Attempt a purchase (replace <token> and <productId>)
 curl -X POST http://localhost:4000/products/<productId>/purchase \
-  -H 'X-User-Id: alice'
+  -H 'Authorization: Bearer <token>'
 
-# Check alice's purchase record
+# Check your purchase record
 curl http://localhost:4000/products/<productId>/purchase/me \
-  -H 'X-User-Id: alice'
+  -H 'Authorization: Bearer <token>'
 
 # Health / readiness
 curl http://localhost:4000/health
@@ -74,12 +90,10 @@ curl http://localhost:4000/ready
 
 ```bash
 cd backend
-
-# Reset Redis stock + clear all DDB purchase records (keeps tables and Docker running)
 npm run seed -- --reset
 ```
 
-Useful for re-running stress tests or starting a fresh purchase round without tearing down Docker.
+Resets Redis stock counters and clears DynamoDB purchase records (keeps tables and Docker running). Useful before re-running stress tests.
 
 ---
 
@@ -87,53 +101,58 @@ Useful for re-running stress tests or starting a fresh purchase round without te
 
 ```bash
 # Backend — Jest (unit + integration)
-Can test from https://github.com/yoelsadriant/flash-sale/actions/workflows/FullTest.yml
 cd backend
 npm test
 npm run test:unit
 npm run test:integration
 npm run test:coverage
 
-# Frontend — Vitest + Testing Library
+# Frontend — Vitest
 cd frontend
 npm test
 npm run test:coverage
 
 # Stress test — backend must be running and seeded
-Can test from https://github.com/yoelsadriant/flash-sale/actions/workflows/StressTest.yml
 cd backend
 npm run seed -- --reset
 npm run stress
 ```
 
-Key correctness test:
+Correctness guarantee: 50 simultaneous requests against 10 units of stock → exactly 10 `PURCHASED`, 40 `SOLD_OUT`, every time. Redis Lua atomicity holds the invariant.
 
-```
-✓ exactly N winners under burst of 50 concurrent attempts on stock=10
-```
-
-50 simultaneous requests against 10 units of stock → exactly 10 `PURCHASED`, 40 `SOLD_OUT`, every time. That's the Redis Lua script holding the invariant.
+CI: [Full test suite](https://github.com/yoelsadriant/flash-sale/actions/workflows/FullTest.yml) · [Stress test](https://github.com/yoelsadriant/flash-sale/actions/workflows/StressTest.yml)
 
 ---
 
 ## How it works
 
 ```
-Browser
-  └─► API Lambda (Express + serverless-http)
+Browser (React + JWT)
+  └─► POST /auth/login  →  JWT token
+  └─► POST /products/:id/purchase  (Authorization: Bearer <token>)
         │
-        ├─ 1. Redis Lua script     ← atomic gate
-        │      DECR stock          ← no oversell
-        │      SADD buyers         ← one per user
-        │      returns immediately
+        ├─ 1. Auth middleware      ← verify JWT, extract userId
         │
-        ├─ 2. SQS SendMessage      ← decouple from DB write
+        ├─ 2. Redis Lua script     ← atomic stock gate
+        │      check buyers set    ← one purchase per user
+        │      check stock > 0     ← no overselling
+        │      DECR stock + SADD buyers (one round-trip, no race)
         │
-        └─ 3. Worker Lambda        ← drains SQS
-               PutItem (conditional)   ← idempotent
+        ├─ 3. SQS SendMessage      ← decouple from DB latency
+        │      → return PURCHASED immediately
+        │
+        └─ 4. Worker Lambda        ← drains SQS asynchronously
+               PutItem (conditional)   ← idempotent DDB write
                ADD stock -1 on ProductsTable
 ```
 
-Redis is the hot path. The Lua script atomically checks stock and the buyers set in one round-trip — no race conditions possible. DynamoDB gets the durable record in the background; `GET /products/:id/purchase/me` falls back to Redis while the write is in flight.
+**Sale phases:** `upcoming` → `active` → `sold_out` | `ended`
 
-See [docs/architecture.md](docs/architecture.md) for full sequence diagrams and schema details.
+**Purchase status check** (`GET /products/:id/purchase/me`) falls back to Redis while the SQS→DDB write is in flight, so the UI always shows the correct state.
+
+**DynamoDB tables:**
+- `ProductsTable` — product catalog with durable stock counter
+- `PurchasesTable` — confirmed purchase records (GSI on userId+productId)
+- `UsersTable` — user accounts with bcrypt password hashes (GSI on email)
+
+See [docs/architecture.md](docs/architecture.md) for full sequence diagrams.

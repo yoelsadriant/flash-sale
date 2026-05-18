@@ -1,12 +1,11 @@
-import type { User } from '../lib/types';
+import { User } from '../interfaces';
 
 interface Props {
-  user: User | null;
-  onSignIn: () => void;
+  user: User;
   onSignOut: () => void;
 }
 
-export function Header({ user, onSignIn, onSignOut }: Props) {
+export function Header({ user, onSignOut }: Props) {
   return (
     <header style={{
       position: 'sticky', top: 0, zIndex: 50,
@@ -35,43 +34,27 @@ export function Header({ user, onSignIn, onSignOut }: Props) {
         </div>
 
         {/* User area */}
-        {user ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '13px', fontWeight: 600 }}>{user.username}</div>
-              <div style={{ fontSize: '10px', color: '#555', fontFamily: "'JetBrains Mono', monospace" }}>
-                {user.id.slice(0, 8)}
-              </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600 }}>{user.email}</div>
+            <div style={{ fontSize: '10px', color: '#555', fontFamily: "'JetBrains Mono', monospace" }}>
+              {user.id.slice(0, 8)}
             </div>
-            <button
-              onClick={onSignOut}
-              style={{
-                padding: '7px 14px', borderRadius: '8px',
-                background: '#1a1a1a', border: '1px solid #2a2a2a',
-                color: '#888', fontSize: '12px', fontWeight: 600,
-                transition: 'all 0.15s',
-              }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#f0f0f0'; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#888'; }}
-            >
-              Sign out
-            </button>
           </div>
-        ) : (
           <button
-            onClick={onSignIn}
+            onClick={onSignOut}
             style={{
-              padding: '8px 18px', borderRadius: '10px',
-              background: 'linear-gradient(135deg,#ff6b35,#e85d25)',
-              color: '#fff', fontWeight: 700, fontSize: '13px',
-              transition: 'opacity 0.15s',
+              padding: '7px 14px', borderRadius: '8px',
+              background: '#1a1a1a', border: '1px solid #2a2a2a',
+              color: '#888', fontSize: '12px', fontWeight: 600,
+              cursor: 'pointer', transition: 'all 0.15s',
             }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = '0.88'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#f0f0f0'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#888'; }}
           >
-            Sign in to buy
+            Sign out
           </button>
-        )}
+        </div>
       </div>
     </header>
   );

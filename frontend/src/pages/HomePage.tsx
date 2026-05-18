@@ -1,39 +1,36 @@
 import { useState } from 'react';
-import type { User, SaleStatusName } from '../lib/types';
+import { useNavigate } from 'react-router-dom';
+import { User, SalePhase } from '../interfaces';
 import { useSales } from '../hooks/useSales';
 import { Header } from '../components/Header';
-import { FilterBar, type FilterKey } from '../components/FilterBar';
+import { FilterKey } from '../interfaces';
+import { FilterBar } from '../components/FilterBar';
 import { SaleCard } from '../components/SaleCard';
-import { LoginModal } from '../components/LoginModal';
 import { logout } from '../api/auth';
 
 interface Props {
-  initialUser: User | null;
+  user: User;
+  onSignOut: () => void;
 }
 
-export function HomePage({ initialUser }: Props) {
-  const [user, setUser] = useState<User | null>(initialUser);
-  const [showLogin, setShowLogin] = useState(false);
+export function HomePage({ user, onSignOut }: Props) {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterKey>('ALL');
   const { sales, loading, error } = useSales();
 
   const filtered = filter === 'ALL'
     ? sales
-    : sales.filter((s) => s.status === (filter as SaleStatusName));
-
-  function handleLogin(u: User) {
-    setUser(u);
-    setShowLogin(false);
-  }
+    : sales.filter((s) => s.status === (filter as SalePhase));
 
   function handleSignOut() {
     logout();
-    setUser(null);
+    onSignOut();
+    navigate('/login');
   }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
-      <Header user={user} onSignIn={() => setShowLogin(true)} onSignOut={handleSignOut} />
+      <Header user={user} onSignOut={handleSignOut} />
 
       {/* Hero */}
       <div style={{ padding: '48px 24px 28px', maxWidth: 'var(--max-w)', margin: '0 auto' }}>
@@ -92,8 +89,7 @@ export function HomePage({ initialUser }: Props) {
           <SaleCard
             key={product.id}
             product={product}
-            user={user}
-            onLoginRequired={() => setShowLogin(true)}
+            userId={user.id}
           />
         ))}
 
@@ -104,10 +100,6 @@ export function HomePage({ initialUser }: Props) {
           </div>
         )}
       </main>
-
-      {showLogin && (
-        <LoginModal onLogin={handleLogin} onClose={() => setShowLogin(false)} />
-      )}
     </div>
   );
 }

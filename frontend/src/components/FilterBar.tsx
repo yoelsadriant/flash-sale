@@ -1,6 +1,4 @@
-import type { SaleStatusName } from '../lib/types';
-
-export type FilterKey = 'ALL' | SaleStatusName;
+import { FilterKey } from '../interfaces';
 
 const TABS: { key: FilterKey; label: string }[] = [
   { key: 'ALL',      label: 'All' },

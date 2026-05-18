@@ -11,13 +11,15 @@ import {
   Config,
   AppLogger,
   Product,
-  StoredProduct,
+  ProductRecord,
   PurchaseRecord,
   DdbWriteResult,
+  UserRecord,
   Ddb,
 } from '../interfaces';
 
 const PURCHASE_GSI = 'userId-productId-index';
+const USER_EMAIL_GSI = 'email-index';
 
 export function makeDdb({
   config,
@@ -41,7 +43,7 @@ export function makeDdb({
 
   return {
     async putProduct(product: Product, { overwrite = false } = {}) {
-      const item: StoredProduct = {
+      const item: ProductRecord = {
         productId: product.id,
         name: product.name,
         description: product.description,
@@ -64,21 +66,21 @@ export function makeDdb({
       });
     },
 
-    async getProduct(productId: string): Promise<StoredProduct | null> {
+    async getProduct(productId: string): Promise<ProductRecord | null> {
       const out = await client.send(
         new GetCommand({
           TableName: config.ddb.productsTable,
           Key: { productId },
         })
       );
-      return (out.Item as StoredProduct) ?? null;
+      return (out.Item as ProductRecord) ?? null;
     },
 
-    async listProducts(): Promise<StoredProduct[]> {
+    async listProducts(): Promise<ProductRecord[]> {
       const out = await client.send(
         new ScanCommand({ TableName: config.ddb.productsTable })
       );
-      const items = (out.Items ?? []) as StoredProduct[];
+      const items = (out.Items ?? []) as ProductRecord[];
       return items.sort((a, b) => a.saleStart.localeCompare(b.saleStart));
     },
 
@@ -131,6 +133,48 @@ export function makeDdb({
           ExpressionAttributeValues: { ':neg': -1 },
         })
       );
+    },
+
+    async createUser(user: UserRecord): Promise<{ created: boolean; reason?: 'duplicate_email' }> {
+      try {
+        await client.send(
+          new PutCommand({
+            TableName: config.ddb.usersTable,
+            Item: user,
+            ConditionExpression: 'attribute_not_exists(userId)',
+          })
+        );
+        return { created: true };
+      } catch (err) {
+        const e = err as { name?: string };
+        if (e.name === 'ConditionalCheckFailedException') {
+          return { created: false, reason: 'duplicate_email' };
+        }
+        throw err;
+      }
+    },
+
+    async getUserByEmail(email: string): Promise<UserRecord | null> {
+      const out = await client.send(
+        new QueryCommand({
+          TableName: config.ddb.usersTable,
+          IndexName: USER_EMAIL_GSI,
+          KeyConditionExpression: 'email = :email',
+          ExpressionAttributeValues: { ':email': email },
+          Limit: 1,
+        })
+      );
+      return (out.Items?.[0] as UserRecord) ?? null;
+    },
+
+    async getUserById(userId: string): Promise<UserRecord | null> {
+      const out = await client.send(
+        new GetCommand({
+          TableName: config.ddb.usersTable,
+          Key: { userId },
+        })
+      );
+      return (out.Item as UserRecord) ?? null;
     },
   };
 }

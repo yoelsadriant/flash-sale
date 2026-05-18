@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { makeAuthMiddleware } from '../../src/api/middleware/auth';
 import { Config, AppLogger, MockRes } from '../../src/interfaces';
 

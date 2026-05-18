@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Product, User } from '../lib/types';
+import { Product } from '../interfaces';
 import { useProductPurchase } from '../hooks/useProductPurchase';
 
 const STATUS_CONFIG = {
@@ -74,13 +74,11 @@ function StockBar({ stock, initialStock }: { stock: number; initialStock: number
 }
 
 function BuyButton({
-  status, phase, onBuy, user, onLoginRequired,
+  status, phase, onBuy,
 }: {
   status: Product['status'];
   phase: string;
   onBuy: () => void;
-  user: User | null;
-  onLoginRequired: () => void;
 }) {
   const disabled = status !== 'active'
     || phase === 'ATTEMPTING'
@@ -137,7 +135,7 @@ function BuyButton({
 
   if (phase === 'ERROR') {
     return (
-      <button onClick={user ? onBuy : onLoginRequired} style={{
+      <button onClick={onBuy} style={{
         width: '100%', padding: '12px', borderRadius: '12px',
         background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
         color: '#ef4444', fontSize: '13px', fontWeight: 700,
@@ -149,7 +147,7 @@ function BuyButton({
 
   return (
     <button
-      onClick={user ? onBuy : onLoginRequired}
+      onClick={onBuy}
       disabled={disabled}
       style={{
         width: '100%', padding: '13px',
@@ -170,12 +168,11 @@ function BuyButton({
 
 interface Props {
   product: Product;
-  user: User | null;
-  onLoginRequired: () => void;
+  userId: string;
 }
 
-export function SaleCard({ product, user, onLoginRequired }: Props) {
-  const { state, attempt } = useProductPurchase(product.id, user?.id ?? null);
+export function SaleCard({ product, userId }: Props) {
+  const { state, attempt } = useProductPurchase(product.id, userId);
   const cfg = STATUS_CONFIG[product.status];
   const discount = discountPct(product.originalPrice, product.price);
 
@@ -271,8 +268,6 @@ export function SaleCard({ product, user, onLoginRequired }: Props) {
           status={product.status}
           phase={state.phase}
           onBuy={attempt}
-          user={user}
-          onLoginRequired={onLoginRequired}
         />
 
         {state.phase === 'ERROR' && state.errorMessage && (
