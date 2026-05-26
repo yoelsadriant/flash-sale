@@ -29,6 +29,7 @@ jobs:
         ports: ["8000:8000"]
 
     env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       REDIS_HOST: localhost
       REDIS_PORT: "6379"
       PURCHASE_QUEUE_URL: http://localhost:9324/000000000000/PurchaseQueue
