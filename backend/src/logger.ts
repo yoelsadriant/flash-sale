@@ -1,11 +1,16 @@
 import pino, { type Logger } from 'pino';
+import pretty from 'pino-pretty';
 
-const logger: Logger = pino({
-  level: process.env.LOG_LEVEL || 'info',
-  base: { service: 'flash-sale', stage: process.env.STAGE || 'local' },
-  ...(process.env.STAGE === 'local'
-    ? { transport: { target: 'pino-pretty', options: { singleLine: true } } }
-    : {}),
-});
+const stream = process.env.STAGE === 'local'
+  ? pretty({ singleLine: true, sync: true })
+  : undefined;
+
+const logger: Logger = pino(
+  { 
+    level: process.env.LOG_LEVEL || 'info', 
+    base: { service: 'flash-sale', stage: process.env.STAGE || 'local' } 
+  },
+  stream,
+);
 
 export default logger;

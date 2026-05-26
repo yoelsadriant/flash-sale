@@ -1,0 +1,3866 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "flash-sale",
+    "languages": [
+      "config",
+      "css",
+      "html",
+      "json",
+      "markdown",
+      "typescript",
+      "yaml"
+    ],
+    "frameworks": [
+      "Docker Compose",
+      "DynamoDB",
+      "Express",
+      "GitHub Actions",
+      "Jest",
+      "React",
+      "Redis",
+      "SQS",
+      "Serverless Framework",
+      "Vite",
+      "Vitest"
+    ],
+    "description": "High-concurrency flash sale platform with atomic Redis Lua stock gating (preventing overselling and duplicate purchases), asynchronous order persistence via SQS and DynamoDB, and a guest-first React + Vite frontend with JWT authentication.",
+    "analyzedAt": "2026-05-26T13:23:17.253794Z",
+    "gitCommitHash": "a132916226e23f3d9e8352d1164b5ea0fba7d196"
+  },
+  "nodes": [
+    {
+      "id": "pipeline:.github/workflows/FullTest.yml",
+      "type": "pipeline",
+      "name": "FullTest.yml",
+      "filePath": ".github/workflows/FullTest.yml",
+      "summary": "GitHub Actions CI pipeline that runs backend unit/integration tests against live Redis, ElasticMQ, and DynamoDB Local services, then runs frontend tests and uploads coverage artifacts on every push.",
+      "tags": [
+        "ci-cd",
+        "testing",
+        "coverage",
+        "deployment"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "pipeline:.github/workflows/StressTest.yml",
+      "type": "pipeline",
+      "name": "StressTest.yml",
+      "filePath": ".github/workflows/StressTest.yml",
+      "summary": "GitHub Actions stress-test pipeline that spins up the full local infrastructure stack, seeds stock, starts serverless-offline, and runs Artillery load tests, triggering automatically after a successful full-test run.",
+      "tags": [
+        "ci-cd",
+        "stress-testing",
+        "artillery",
+        "deployment"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.nvmrc",
+      "type": "config",
+      "name": ".nvmrc",
+      "filePath": ".nvmrc",
+      "summary": "Node Version Manager configuration pinning the Node.js version for this project to ensure consistent runtime environments across development and CI.",
+      "tags": [
+        "configuration",
+        "nodejs",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Project overview and getting-started guide covering prerequisites, local development setup for both backend and frontend, authentication flows, API endpoint verification, state reset between runs, unit tests, and stress test design with 13 sections.",
+      "tags": [
+        "documentation",
+        "entry-point",
+        "overview"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/architecture.md",
+      "type": "document",
+      "name": "architecture.md",
+      "filePath": "docs/architecture.md",
+      "summary": "Comprehensive architecture reference documenting the system overview, API endpoints, purchase flow, sale state machine, Redis key schema with Lua scripting rationale, DynamoDB schema, stress test design, frontend routing, and local infrastructure setup across 17 sections.",
+      "tags": [
+        "documentation",
+        "architecture",
+        "database",
+        "infrastructure"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:backend/.env.example",
+      "type": "config",
+      "name": ".env.example",
+      "filePath": "backend/.env.example",
+      "summary": "Example environment variable template defining runtime configuration for stage, auth mode, Redis connection, SQS queue, and DynamoDB endpoints and table names for local and cloud deployments.",
+      "tags": [
+        "configuration",
+        "security",
+        "infrastructure"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "service:backend/docker-compose.yml",
+      "type": "service",
+      "name": "docker-compose.yml",
+      "filePath": "backend/docker-compose.yml",
+      "summary": "Local development infrastructure orchestration bringing up Redis, ElasticMQ (SQS-compatible), and DynamoDB Local with health checks so services are ready before the application starts.",
+      "tags": [
+        "orchestration",
+        "infrastructure",
+        "containerization",
+        "deployment"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Uses `docker compose up -d --wait` pattern with health checks on Redis and ElasticMQ; DynamoDB Local readiness is instead polled by the bootstrap script."
+    },
+    {
+      "id": "config:backend/elasticmq.conf",
+      "type": "config",
+      "name": "elasticmq.conf",
+      "filePath": "backend/elasticmq.conf",
+      "summary": "ElasticMQ configuration file defining the local SQS-compatible queue server settings including the PurchaseQueue endpoint and binding options for development use.",
+      "tags": [
+        "configuration",
+        "infrastructure",
+        "messaging"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:backend/package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "backend/package.json",
+      "summary": "Backend Node.js package manifest defining scripts for build, test, offline serving, and stress testing, along with runtime dependencies (Express, Redis, DynamoDB, SQS, pino) and Jest configuration for TypeScript tests.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "dependency-management"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:backend/serverless.yml",
+      "type": "config",
+      "name": "serverless.yml",
+      "filePath": "backend/serverless.yml",
+      "summary": "Serverless Framework configuration deploying the flash-sale lambdalith to AWS with an API Lambda (catch-all HTTP) and a worker Lambda (SQS-triggered), plus CloudFormation resources for SQS queues (with DLQ) and DynamoDB tables for purchases, products, and users.",
+      "tags": [
+        "configuration",
+        "infrastructure",
+        "deployment",
+        "cloud"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Uses Serverless Framework v3/v4 with serverless-offline and serverless-offline-sqs plugins for local simulation; IAM roles are inline in the provider block."
+    },
+    {
+      "id": "config:backend/tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "backend/tsconfig.json",
+      "summary": "TypeScript compiler configuration for the backend enabling strict mode with Node22 target and path alias `@/` mapping to the `src/` directory.",
+      "tags": [
+        "configuration",
+        "typescript",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/tsup.config.ts",
+      "type": "file",
+      "name": "tsup.config.ts",
+      "filePath": "backend/tsup.config.ts",
+      "summary": "tsup bundler configuration producing CommonJS bundles for both the API handler and SQS worker handler entry points, with full dependency bundling for Lambda deployment (no node_modules on Lambda).",
+      "tags": [
+        "build-system",
+        "configuration",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/config.ts",
+      "type": "file",
+      "name": "config.ts",
+      "filePath": "backend/src/config.ts",
+      "summary": "Exports `loadConfig`, which reads environment variables and assembles the typed application `Config` object with sensible local development defaults for Redis, SQS, DynamoDB, JWT, and Cognito settings.",
+      "tags": [
+        "configuration",
+        "utility",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/src/config.ts:loadConfig",
+      "type": "function",
+      "name": "loadConfig",
+      "filePath": "backend/src/config.ts",
+      "lineRange": [
+        3,
+        35
+      ],
+      "summary": "Reads `process.env` (or a supplied env object) and returns a fully-typed `Config` object with all connection and auth settings, defaulting to local development values when variables are absent.",
+      "tags": [
+        "configuration",
+        "factory",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/types/adapters.ts",
+      "type": "file",
+      "name": "adapters.ts",
+      "filePath": "backend/src/types/adapters.ts",
+      "summary": "Defines the `Ddb` and `Queue` adapter interfaces that abstract DynamoDB and SQS operations, enabling dependency injection and test doubles for the data layer.",
+      "tags": [
+        "type-definition",
+        "service",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/types/app.ts",
+      "type": "file",
+      "name": "app.ts",
+      "filePath": "backend/src/types/app.ts",
+      "summary": "Defines application-level type interfaces including `AppDeps`, `AppWithDeps`, `ProductContext`, `AuthedRequest`, `AuthedUser`, and `MockRes`, wiring together the core runtime dependencies and auth context types.",
+      "tags": [
+        "type-definition",
+        "middleware",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/types/config.ts",
+      "type": "file",
+      "name": "config.ts",
+      "filePath": "backend/src/types/config.ts",
+      "summary": "Defines the `Config` interface describing the full typed application configuration shape covering stage, auth, Redis, SQS, DynamoDB, and Cognito settings.",
+      "tags": [
+        "type-definition",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/types/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "backend/src/types/index.ts",
+      "summary": "Barrel re-exporting all type definitions from the `types` subdirectory, providing a single import point (`@/types`) for all shared interfaces and types across the backend.",
+      "tags": [
+        "barrel",
+        "type-definition",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/types/product.ts",
+      "type": "file",
+      "name": "product.ts",
+      "filePath": "backend/src/types/product.ts",
+      "summary": "Defines the `Product` (API/domain) and `ProductRecord` (DynamoDB storage) interfaces capturing product identity, pricing, stock count, and sale window timestamps.",
+      "tags": [
+        "type-definition",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/types/purchase.ts",
+      "type": "file",
+      "name": "purchase.ts",
+      "filePath": "backend/src/types/purchase.ts",
+      "summary": "Defines purchase-related types including `PurchaseAttemptOutcome` (PURCHASED/SOLD_OUT/ALREADY_PURCHASED/NOT_ACTIVE), `PurchaseAttemptResult`, `PurchaseMessage` (SQS payload), `PurchaseRecord` (DynamoDB), and the `PurchaseService` interface.",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/types/sale.ts",
+      "type": "file",
+      "name": "sale.ts",
+      "filePath": "backend/src/types/sale.ts",
+      "summary": "Defines the `SalePhase` union type (upcoming/active/sold_out/ended), `SaleSnapshot` snapshot interface, and `SaleService` interface for querying current sale status.",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/types/stock.ts",
+      "type": "file",
+      "name": "stock.ts",
+      "filePath": "backend/src/types/stock.ts",
+      "summary": "Defines TypeScript type definitions for stock-related data structures used throughout the flash-sale backend.",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "stock"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/types/user.ts",
+      "type": "file",
+      "name": "user.ts",
+      "filePath": "backend/src/types/user.ts",
+      "summary": "Defines TypeScript type definitions for user entities including authentication and public user representations.",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "authentication"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/adapters/ddb.ts",
+      "type": "file",
+      "name": "ddb.ts",
+      "filePath": "backend/src/adapters/ddb.ts",
+      "summary": "Factory function that creates a DynamoDB adapter encapsulating all data access operations for products, purchases, and users using a repository pattern.",
+      "tags": [
+        "service",
+        "data-model",
+        "factory",
+        "database"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Uses a single factory function returning an object of closures over a shared DynamoDBDocumentClient, providing a clean repository interface without class-based OOP."
+    },
+    {
+      "id": "function:backend/src/adapters/ddb.ts:makeDdb",
+      "type": "function",
+      "name": "makeDdb",
+      "filePath": "backend/src/adapters/ddb.ts",
+      "lineRange": [
+        24,
+        180
+      ],
+      "summary": "Factory that creates and returns a DynamoDB document client along with all data access methods (putProduct, getProduct, listProducts, writePurchase, getPurchaseByUser, decrementProductStock, createUser, getUserByEmail, getUserById).",
+      "tags": [
+        "factory",
+        "service",
+        "database"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:backend/src/adapters/queue.ts",
+      "type": "file",
+      "name": "queue.ts",
+      "filePath": "backend/src/adapters/queue.ts",
+      "summary": "Factory function that creates an SQS adapter for sending purchase events to an asynchronous processing queue.",
+      "tags": [
+        "service",
+        "factory",
+        "event-handler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/src/adapters/queue.ts:makeQueue",
+      "type": "function",
+      "name": "makeQueue",
+      "filePath": "backend/src/adapters/queue.ts",
+      "lineRange": [
+        4,
+        36
+      ],
+      "summary": "Factory that creates an SQS client and returns a sendPurchase method that enqueues purchase payloads as JSON messages.",
+      "tags": [
+        "factory",
+        "service",
+        "event-handler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/adapters/redis.ts",
+      "type": "file",
+      "name": "redis.ts",
+      "filePath": "backend/src/adapters/redis.ts",
+      "summary": "Factory function that creates and configures an ioredis client with error and connection event logging.",
+      "tags": [
+        "service",
+        "factory",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/src/adapters/redis.ts:makeRedis",
+      "type": "function",
+      "name": "makeRedis",
+      "filePath": "backend/src/adapters/redis.ts",
+      "lineRange": [
+        4,
+        23
+      ],
+      "summary": "Creates an ioredis client pointed at the configured Redis host, wires error and ready event handlers for logging, and returns the client.",
+      "tags": [
+        "factory",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/api/middleware/auth.ts",
+      "type": "file",
+      "name": "auth.ts",
+      "filePath": "backend/src/api/middleware/auth.ts",
+      "summary": "Express middleware factory that validates requests using either local JWT or AWS Cognito JWT verification, attaching decoded user claims to the request object.",
+      "tags": [
+        "middleware",
+        "authentication",
+        "security",
+        "tested"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Supports dual auth modes \u2014 local JWT (for non-Cognito deployments) and Cognito JWTs \u2014 selected by whether a Cognito config is present."
+    },
+    {
+      "id": "function:backend/src/api/middleware/auth.ts:makeAuthMiddleware",
+      "type": "function",
+      "name": "makeAuthMiddleware",
+      "filePath": "backend/src/api/middleware/auth.ts",
+      "lineRange": [
+        8,
+        79
+      ],
+      "summary": "Returns an Express middleware function that authenticates Bearer tokens using either aws-jwt-verify (Cognito) or jsonwebtoken depending on runtime configuration.",
+      "tags": [
+        "middleware",
+        "authentication",
+        "security"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/src/api/routes/auth.ts",
+      "type": "file",
+      "name": "auth.ts",
+      "filePath": "backend/src/api/routes/auth.ts",
+      "summary": "Express router factory exposing signup, login, and Google OAuth login endpoints that delegate to the user service for authentication logic.",
+      "tags": [
+        "api-handler",
+        "authentication",
+        "service",
+        "tested"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/src/api/routes/auth.ts:makeAuthRoutes",
+      "type": "function",
+      "name": "makeAuthRoutes",
+      "filePath": "backend/src/api/routes/auth.ts",
+      "lineRange": [
+        9,
+        65
+      ],
+      "summary": "Creates and returns an Express Router with POST /signup, /login, and /login-google routes with input validation and delegated auth logic.",
+      "tags": [
+        "api-handler",
+        "authentication"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/src/services/purchaseService.ts",
+      "type": "file",
+      "name": "purchaseService.ts",
+      "filePath": "backend/src/services/purchaseService.ts",
+      "summary": "Core purchase orchestration service that coordinates atomic Redis stock reservation, SQS enqueuing, and DynamoDB purchase retrieval while handling rollback on queue failure.",
+      "tags": [
+        "service",
+        "factory",
+        "validation",
+        "tested"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Implements an optimistic lock pattern: reserves stock in Redis atomically, then enqueues for durable persistence; releases the reservation if the queue write fails."
+    },
+    {
+      "id": "function:backend/src/services/purchaseService.ts:makeProductPurchaseService",
+      "type": "function",
+      "name": "makeProductPurchaseService",
+      "filePath": "backend/src/services/purchaseService.ts",
+      "lineRange": [
+        27,
+        80
+      ],
+      "summary": "Returns an object with attempt (atomic stock reservation + SQS enqueue) and getUserPurchase (checks DDB and Redis for prior purchase) methods for a given product.",
+      "tags": [
+        "service",
+        "factory"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/src/services/saleService.ts",
+      "type": "file",
+      "name": "saleService.ts",
+      "filePath": "backend/src/services/saleService.ts",
+      "summary": "Service that computes and exposes the current sale status (upcoming, active, ended, sold_out) for a product by combining time window checks with live Redis stock counts.",
+      "tags": [
+        "service",
+        "factory",
+        "data-model",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/src/services/saleService.ts:computeStatus",
+      "type": "function",
+      "name": "computeStatus",
+      "filePath": "backend/src/services/saleService.ts",
+      "lineRange": [
+        3,
+        18
+      ],
+      "summary": "Pure function that derives a sale status string from the current timestamp, sale window boundaries, and remaining stock count.",
+      "tags": [
+        "utility",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/src/services/saleService.ts:makeProductSaleService",
+      "type": "function",
+      "name": "makeProductSaleService",
+      "filePath": "backend/src/services/saleService.ts",
+      "lineRange": [
+        20,
+        50
+      ],
+      "summary": "Returns a getStatus method that fetches live stock from Redis, computes the current sale state, and returns a fully hydrated status object including stock count and timestamps.",
+      "tags": [
+        "service",
+        "factory"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/services/stockService.ts",
+      "type": "file",
+      "name": "stockService.ts",
+      "filePath": "backend/src/services/stockService.ts",
+      "summary": "Redis-backed stock management service implementing atomic Lua scripts for oversell-safe reservation and idempotent release, preventing duplicate purchases per user.",
+      "tags": [
+        "service",
+        "factory",
+        "validation",
+        "tested"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Exports embedded Lua scripts (RESERVE_LUA, RELEASE_LUA) for use by tests and the service itself; Lua atomicity in Redis is the primary oversell-prevention mechanism."
+    },
+    {
+      "id": "function:backend/src/services/stockService.ts:makeStockService",
+      "type": "function",
+      "name": "makeStockService",
+      "filePath": "backend/src/services/stockService.ts",
+      "lineRange": [
+        62,
+        128
+      ],
+      "summary": "Returns a stock service object with initialize, reset, getStock, getPurchasedCount, hasUserPurchased, reserve, and release methods backed by Redis operations including Lua eval for atomic stock gating.",
+      "tags": [
+        "service",
+        "factory"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:backend/src/services/userService.ts",
+      "type": "file",
+      "name": "userService.ts",
+      "filePath": "backend/src/services/userService.ts",
+      "summary": "User authentication service providing signup, login (password + bcrypt), Google OAuth login, and JWT token signing/verification backed by DynamoDB storage.",
+      "tags": [
+        "service",
+        "factory",
+        "authentication",
+        "tested"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:backend/src/services/userService.ts:makeUserService",
+      "type": "function",
+      "name": "makeUserService",
+      "filePath": "backend/src/services/userService.ts",
+      "lineRange": [
+        17,
+        115
+      ],
+      "summary": "Factory returning signup, login, loginWithGoogle, and verifyToken methods that use bcrypt for password hashing and jsonwebtoken for JWT issuance.",
+      "tags": [
+        "service",
+        "factory",
+        "authentication"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:backend/src/worker/handler.ts",
+      "type": "file",
+      "name": "handler.ts",
+      "filePath": "backend/src/worker/handler.ts",
+      "summary": "AWS Lambda SQS worker handler that processes purchase records by persisting them to DynamoDB and decrementing the product stock count with per-record failure tracking.",
+      "tags": [
+        "api-handler",
+        "entry-point",
+        "event-handler",
+        "tested"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/src/worker/handler.ts:processRecord",
+      "type": "function",
+      "name": "processRecord",
+      "filePath": "backend/src/worker/handler.ts",
+      "lineRange": [
+        20,
+        42
+      ],
+      "summary": "Parses a single SQS record body, writes the purchase to DynamoDB, and decrements the product stock counter, returning a result object.",
+      "tags": [
+        "event-handler",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/src/worker/handler.ts:handler",
+      "type": "function",
+      "name": "handler",
+      "filePath": "backend/src/worker/handler.ts",
+      "lineRange": [
+        44,
+        60
+      ],
+      "summary": "Lambda entry point that fans out SQS event records to processRecord concurrently and collects batchItemFailures for partial-batch failure support.",
+      "tags": [
+        "entry-point",
+        "event-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:backend/tests/stress/flash-sale.yml",
+      "type": "config",
+      "name": "flash-sale.yml",
+      "filePath": "backend/tests/stress/flash-sale.yml",
+      "summary": "Artillery stress test configuration defining load scenarios that simulate concurrent flash-sale purchase attempts to validate oversell prevention and system throughput.",
+      "tags": [
+        "configuration",
+        "ci-cd",
+        "test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/tests/stress/generate-user.ts",
+      "type": "file",
+      "name": "generate-user.ts",
+      "filePath": "backend/tests/stress/generate-user.ts",
+      "summary": "Artillery beforeScenario hook that generates a unique UUID user ID for each virtual user in the stress test scenario.",
+      "tags": [
+        "test",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/index.html",
+      "type": "file",
+      "name": "index.html",
+      "filePath": "frontend/index.html",
+      "summary": "Root HTML shell for the Vite-powered React frontend, providing the app mount point and loading the main TypeScript entry module.",
+      "tags": [
+        "entry-point",
+        "markup"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:frontend/package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "frontend/package.json",
+      "summary": "Frontend package manifest configuring the Vite + React build, declaring dependencies (React, React Router, Axios) and devDependencies (Vite, TypeScript plugin).",
+      "tags": [
+        "configuration",
+        "build-system",
+        "dependency-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/tests/integration/api.test.ts",
+      "type": "file",
+      "name": "api.test.ts",
+      "filePath": "backend/tests/integration/api.test.ts",
+      "summary": "End-to-end integration tests for the Express API layer, covering product listing, purchase flow (concurrent burst, idempotency, sold-out, not-active), and purchase lookup with Redis-then-DDB fallback using fake Queue and DDB adapters.",
+      "tags": [
+        "test",
+        "integration",
+        "api-handler",
+        "validation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:backend/tests/integration/worker.test.ts",
+      "type": "file",
+      "name": "worker.test.ts",
+      "filePath": "backend/tests/integration/worker.test.ts",
+      "summary": "Integration tests for the SQS Lambda worker handler, verifying idempotent DDB writes, per-record failure reporting, and graceful handling of duplicate and malformed messages using aws-sdk-client-mock.",
+      "tags": [
+        "test",
+        "integration",
+        "event-handler",
+        "service"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/tests/unit/authMiddleware.test.ts",
+      "type": "file",
+      "name": "authMiddleware.test.ts",
+      "filePath": "backend/tests/unit/authMiddleware.test.ts",
+      "summary": "Unit tests for the Express auth middleware across all four auth modes (local X-User-Id header, JWT, Cognito, and prod bearer), verifying token extraction, user attachment, and 401 error paths.",
+      "tags": [
+        "test",
+        "middleware",
+        "validation",
+        "security"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:backend/tests/unit/authRoutes.test.ts",
+      "type": "file",
+      "name": "authRoutes.test.ts",
+      "filePath": "backend/tests/unit/authRoutes.test.ts",
+      "summary": "Unit tests for the auth route handlers (signup, login, Google OAuth), validating input constraints, error responses, and token issuance using a mocked UserService.",
+      "tags": [
+        "test",
+        "api-handler",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/tests/unit/productsRoutes.test.ts",
+      "type": "file",
+      "name": "productsRoutes.test.ts",
+      "filePath": "backend/tests/unit/productsRoutes.test.ts",
+      "summary": "Unit tests for the products route handler, covering unauthenticated guard, all purchase result branches (NOT_ACTIVE, SOLD_OUT, PURCHASED, unknown status), error propagation via next(err), and purchase status lookup.",
+      "tags": [
+        "test",
+        "api-handler",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/tests/unit/purchaseService.test.ts",
+      "type": "file",
+      "name": "purchaseService.test.ts",
+      "filePath": "backend/tests/unit/purchaseService.test.ts",
+      "summary": "Unit tests for the purchase service, exercising attempt outcomes (PURCHASED, ALREADY_PURCHASED, SOLD_OUT, NOT_ACTIVE upcoming/ended), SQS rollback on failure, and getUserPurchase with Redis-then-DDB fallback.",
+      "tags": [
+        "test",
+        "service",
+        "validation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:backend/tests/unit/saleService.test.ts",
+      "type": "file",
+      "name": "saleService.test.ts",
+      "filePath": "backend/tests/unit/saleService.test.ts",
+      "summary": "Unit tests for the sale service, validating the computeStatus pure function across all lifecycle states (upcoming, active, sold_out, ended, null-stock edge case) and the getStatus snapshot builder.",
+      "tags": [
+        "test",
+        "service",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/tests/unit/stockService.test.ts",
+      "type": "file",
+      "name": "stockService.test.ts",
+      "filePath": "backend/tests/unit/stockService.test.ts",
+      "summary": "Unit tests for the Redis stock service Lua-scripted operations, including idempotent initialize, reserve/release lifecycle, concurrent burst atomicity (100 goroutine-equivalent parallel requests), and error handling for unexpected Lua return values.",
+      "tags": [
+        "test",
+        "service",
+        "validation"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "The concurrency test fires 100 parallel reserve() calls against ioredis-mock to verify atomic Lua script behavior."
+    },
+    {
+      "id": "file:backend/tests/unit/userService.test.ts",
+      "type": "file",
+      "name": "userService.test.ts",
+      "filePath": "backend/tests/unit/userService.test.ts",
+      "summary": "Unit tests for the user service covering signup (email normalization, bcrypt hashing, email_taken, race condition), login (credential validation, email normalization), Google OAuth login (new and returning user), and JWT verifyToken (valid, tampered, expired).",
+      "tags": [
+        "test",
+        "service",
+        "validation",
+        "security"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:frontend/tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "frontend/tsconfig.json",
+      "summary": "TypeScript compiler configuration for the React frontend, enabling strict mode, bundler-based module resolution, react-jsx transform, path alias @/* -> src/*, and Vitest globals type declarations.",
+      "tags": [
+        "configuration",
+        "typescript",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/vite.config.ts",
+      "type": "file",
+      "name": "vite.config.ts",
+      "filePath": "frontend/vite.config.ts",
+      "summary": "Vite build configuration for the React frontend, setting up the React plugin, @/ path alias, dev-server proxy forwarding /api to localhost:4000, and ES2022 production build with sourcemaps.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "middleware"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/vitest.config.ts",
+      "type": "file",
+      "name": "vitest.config.ts",
+      "filePath": "frontend/vitest.config.ts",
+      "summary": "Vitest configuration for the frontend test suite, merging Vite config and enabling jsdom environment, global test APIs, CSS processing, and v8 coverage reporting over src/**.",
+      "tags": [
+        "configuration",
+        "test",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/src/vite-env.d.ts",
+      "type": "file",
+      "name": "vite-env.d.ts",
+      "filePath": "frontend/src/vite-env.d.ts",
+      "summary": "Vite client type declarations augmenting ImportMeta with the optional VITE_API_BASE environment variable for typed access to runtime configuration.",
+      "tags": [
+        "type-definition",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/src/types/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "frontend/src/types/index.ts",
+      "summary": "Barrel re-export file that aggregates all frontend type definitions from sale, purchase, and user modules into a single public surface.",
+      "tags": [
+        "barrel",
+        "type-definition",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/src/types/purchase.ts",
+      "type": "file",
+      "name": "purchase.ts",
+      "filePath": "frontend/src/types/purchase.ts",
+      "summary": "Defines all purchase-related TypeScript types for the frontend: purchase phase enum, attempt outcome union, attempt result interface, user purchase record, and purchase UI state.",
+      "tags": [
+        "type-definition",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/src/types/sale.ts",
+      "type": "file",
+      "name": "sale.ts",
+      "filePath": "frontend/src/types/sale.ts",
+      "summary": "Defines sale lifecycle types for the frontend: SalePhase union, FilterKey, SaleSnapshot interface, and the Product interface that extends SaleSnapshot with display metadata.",
+      "tags": [
+        "type-definition",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/src/types/user.ts",
+      "type": "file",
+      "name": "user.ts",
+      "filePath": "frontend/src/types/user.ts",
+      "summary": "Defines the frontend User and AuthResponse interfaces used across authentication flows and user session state.",
+      "tags": [
+        "type-definition",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/src/styles/global.css",
+      "type": "file",
+      "name": "global.css",
+      "filePath": "frontend/src/styles/global.css",
+      "summary": "Global CSS baseline stylesheet providing CSS custom properties for the design token palette (colors, gradients), body defaults, and utility resets applied across the entire frontend.",
+      "tags": [
+        "configuration",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/src/components/Header.module.css",
+      "type": "file",
+      "name": "Header.module.css",
+      "filePath": "frontend/src/components/Header.module.css",
+      "summary": "CSS Module stylesheet for the Header component, containing scoped styles for the navigation bar, user badge, sign-out button, and responsive layout rules.",
+      "tags": [
+        "component",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/src/main.tsx",
+      "type": "file",
+      "name": "main.tsx",
+      "filePath": "frontend/src/main.tsx",
+      "summary": "React application entry point that mounts the App component into the DOM root within React StrictMode and imports the global CSS baseline.",
+      "tags": [
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/src/App.tsx",
+      "type": "file",
+      "name": "App.tsx",
+      "filePath": "frontend/src/App.tsx",
+      "summary": "Root React component that manages authenticated user state, wraps the app in ApiProvider, and defines client-side routes for HomePage (/) and LoginPage (/login) with redirect guards.",
+      "tags": [
+        "entry-point",
+        "component",
+        "api-handler",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/src/api/ApiProvider.tsx",
+      "type": "file",
+      "name": "ApiProvider.tsx",
+      "filePath": "frontend/src/api/ApiProvider.tsx",
+      "summary": "React context provider and hook that exposes a shared ApiClient instance (configured with auth headers) to all descendant components, enabling dependency injection of the API client for testing.",
+      "tags": [
+        "component",
+        "service",
+        "middleware",
+        "tested"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Exports both the ApiProvider component and a useApi hook, following the provider-hook pattern for React context injection."
+    },
+    {
+      "id": "file:frontend/src/api/auth.ts",
+      "type": "file",
+      "name": "auth.ts",
+      "filePath": "frontend/src/api/auth.ts",
+      "summary": "Provides localStorage-backed session management helpers for JWT auth: reading/storing token and user, building Authorization headers, and clearing the session on logout.",
+      "tags": [
+        "utility",
+        "authentication",
+        "service",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/src/api/auth.ts:storeSession",
+      "type": "function",
+      "name": "storeSession",
+      "filePath": "frontend/src/api/auth.ts",
+      "lineRange": [
+        16,
+        19
+      ],
+      "summary": "Persists a JWT token and serialized user object to localStorage after a successful authentication.",
+      "tags": [
+        "authentication",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/src/api/auth.ts:getAuthHeaders",
+      "type": "function",
+      "name": "getAuthHeaders",
+      "filePath": "frontend/src/api/auth.ts",
+      "lineRange": [
+        26,
+        30
+      ],
+      "summary": "Constructs the Authorization Bearer header object from the stored JWT token, returning an empty object when no token is present.",
+      "tags": [
+        "authentication",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/src/api/client.ts",
+      "type": "file",
+      "name": "client.ts",
+      "filePath": "frontend/src/api/client.ts",
+      "summary": "Defines the ApiError class and makeClient factory that constructs a typed HTTP client with configurable base URL, auth headers injection, and methods for auth, product, and purchase endpoints.",
+      "tags": [
+        "api-handler",
+        "factory",
+        "service",
+        "tested"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:frontend/src/api/client.ts:ApiError",
+      "type": "class",
+      "name": "ApiError",
+      "filePath": "frontend/src/api/client.ts",
+      "lineRange": [
+        11,
+        16
+      ],
+      "summary": "Custom Error subclass carrying an HTTP status code alongside the error message for structured API error handling.",
+      "tags": [
+        "utility",
+        "api-handler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/src/api/client.ts:makeClient",
+      "type": "function",
+      "name": "makeClient",
+      "filePath": "frontend/src/api/client.ts",
+      "lineRange": [
+        22,
+        104
+      ],
+      "summary": "Factory function that assembles and returns an API client object with a shared internal request helper and typed methods for signup, login, Google login, getProducts, attemptProductPurchase, and getProductPurchase.",
+      "tags": [
+        "factory",
+        "api-handler",
+        "service"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:frontend/src/components/FilterBar.tsx",
+      "type": "file",
+      "name": "FilterBar.tsx",
+      "filePath": "frontend/src/components/FilterBar.tsx",
+      "summary": "Renders a tab-based filter bar allowing users to switch between sale status categories (e.g. upcoming, active, ended, sold-out) and propagates the selection via an onChange callback.",
+      "tags": [
+        "component",
+        "utility",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/src/components/FilterBar.tsx:FilterBar",
+      "type": "function",
+      "name": "FilterBar",
+      "filePath": "frontend/src/components/FilterBar.tsx",
+      "lineRange": [
+        16,
+        46
+      ],
+      "summary": "React component that renders a set of tab buttons for filtering products by sale status, highlighting the active tab and calling onChange on selection.",
+      "tags": [
+        "component",
+        "event-handler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/src/components/Header.tsx",
+      "type": "file",
+      "name": "Header.tsx",
+      "filePath": "frontend/src/components/Header.tsx",
+      "summary": "Renders the app navigation header showing the flash sale brand, authenticated user identity with a truncated ID, and a sign-out action that triggers navigation.",
+      "tags": [
+        "component",
+        "utility",
+        "tested"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/src/components/Header.tsx:Header",
+      "type": "function",
+      "name": "Header",
+      "filePath": "frontend/src/components/Header.tsx",
+      "lineRange": [
+        9,
+        81
+      ],
+      "summary": "React component rendering the site header with user info, sign-out button, and react-router navigation.",
+      "tags": [
+        "component",
+        "event-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/src/components/SaleCard.tsx",
+      "type": "file",
+      "name": "SaleCard.tsx",
+      "filePath": "frontend/src/components/SaleCard.tsx",
+      "summary": "Comprehensive product card component for the flash sale UI, composing a countdown timer, stock progress bar, and purchase button with full purchase-lifecycle state management via useProductPurchase.",
+      "tags": [
+        "component",
+        "event-handler",
+        "tested"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:frontend/src/components/SaleCard.tsx:useCountdown",
+      "type": "function",
+      "name": "useCountdown",
+      "filePath": "frontend/src/components/SaleCard.tsx",
+      "lineRange": [
+        17,
+        33
+      ],
+      "summary": "Custom hook that computes and periodically updates hours/minutes/seconds remaining until a target datetime using setInterval.",
+      "tags": [
+        "hook",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/src/components/SaleCard.tsx:StockBar",
+      "type": "function",
+      "name": "StockBar",
+      "filePath": "frontend/src/components/SaleCard.tsx",
+      "lineRange": [
+        50,
+        75
+      ],
+      "summary": "React component rendering a visual stock availability progress bar with percentage fill derived from current versus initial stock.",
+      "tags": [
+        "component",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/src/components/SaleCard.tsx:BuyButton",
+      "type": "function",
+      "name": "BuyButton",
+      "filePath": "frontend/src/components/SaleCard.tsx",
+      "lineRange": [
+        77,
+        168
+      ],
+      "summary": "React component rendering an adaptive purchase button whose label and appearance reflect the current purchase phase (idle, loading, success, various error states).",
+      "tags": [
+        "component",
+        "event-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:frontend/src/components/SaleCard.tsx:SaleCard",
+      "type": "function",
+      "name": "SaleCard",
+      "filePath": "frontend/src/components/SaleCard.tsx",
+      "lineRange": [
+        175,
+        288
+      ],
+      "summary": "Primary exported React component combining product metadata, pricing, countdown, stock bar, and buy button into a cohesive flash sale product card.",
+      "tags": [
+        "component",
+        "entry-point"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:frontend/src/hooks/useProductPurchase.ts",
+      "type": "file",
+      "name": "useProductPurchase.ts",
+      "filePath": "frontend/src/hooks/useProductPurchase.ts",
+      "summary": "Custom React hook managing the full purchase lifecycle for a single product: checking for an existing confirmed purchase on mount, submitting a new purchase attempt, and tracking phase transitions (idle, loading, purchased, sold-out, duplicate, error).",
+      "tags": [
+        "hook",
+        "service",
+        "event-handler",
+        "tested"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/src/hooks/useProductPurchase.ts:useProductPurchase",
+      "type": "function",
+      "name": "useProductPurchase",
+      "filePath": "frontend/src/hooks/useProductPurchase.ts",
+      "lineRange": [
+        5,
+        52
+      ],
+      "summary": "Hook that initializes purchase state, checks for a pre-existing confirmed purchase, and exposes an attempt callback with granular status/phase state updates.",
+      "tags": [
+        "hook",
+        "service"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/src/hooks/useSales.ts",
+      "type": "file",
+      "name": "useSales.ts",
+      "filePath": "frontend/src/hooks/useSales.ts",
+      "summary": "Custom React hook that polls the /products API on a schedule, managing loading and error state, and automatically refreshing while any upcoming or active sales remain.",
+      "tags": [
+        "hook",
+        "service",
+        "tested"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/src/hooks/useSales.ts:useSales",
+      "type": "function",
+      "name": "useSales",
+      "filePath": "frontend/src/hooks/useSales.ts",
+      "lineRange": [
+        5,
+        47
+      ],
+      "summary": "Hook that fetches the product list, stores results in state, and implements a polling loop with setTimeout that continues as long as live sales exist.",
+      "tags": [
+        "hook",
+        "service"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/src/pages/HomePage.tsx",
+      "type": "file",
+      "name": "HomePage.tsx",
+      "filePath": "frontend/src/pages/HomePage.tsx",
+      "summary": "Main authenticated page composing the Header, FilterBar, and a grid of SaleCard components driven by the useSales hook, with loading skeletons and empty-state handling.",
+      "tags": [
+        "component",
+        "entry-point",
+        "tested"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/src/pages/HomePage.tsx:HomePage",
+      "type": "function",
+      "name": "HomePage",
+      "filePath": "frontend/src/pages/HomePage.tsx",
+      "lineRange": [
+        15,
+        104
+      ],
+      "summary": "React page component rendering the flash sale product listing with filter tab, loading skeleton, and sign-out handling.",
+      "tags": [
+        "component",
+        "event-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/src/pages/LoginPage.tsx",
+      "type": "file",
+      "name": "LoginPage.tsx",
+      "filePath": "frontend/src/pages/LoginPage.tsx",
+      "summary": "Authentication page supporting email/password login, new-user signup, and Google OAuth, with inline validation, loading states, and session storage on success.",
+      "tags": [
+        "component",
+        "authentication",
+        "tested"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:frontend/src/pages/LoginPage.tsx:LoginPage",
+      "type": "function",
+      "name": "LoginPage",
+      "filePath": "frontend/src/pages/LoginPage.tsx",
+      "lineRange": [
+        13,
+        268
+      ],
+      "summary": "React page component handling email/password login, signup, and Google auth flows with form state, error display, and session persistence via storeSession.",
+      "tags": [
+        "component",
+        "authentication",
+        "event-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:frontend/tests/App.test.tsx",
+      "type": "file",
+      "name": "App.test.tsx",
+      "filePath": "frontend/tests/App.test.tsx",
+      "summary": "Integration tests for the root App component, verifying routing between LoginPage and HomePage based on session state.",
+      "tags": [
+        "test",
+        "component"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/tests/api/ApiProvider.test.tsx",
+      "type": "file",
+      "name": "ApiProvider.test.tsx",
+      "filePath": "frontend/tests/api/ApiProvider.test.tsx",
+      "summary": "Unit tests for the ApiProvider context, verifying that the useApi hook correctly exposes the client instance to consumers.",
+      "tags": [
+        "test",
+        "api-handler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/tests/api/auth.test.ts",
+      "type": "file",
+      "name": "auth.test.ts",
+      "filePath": "frontend/tests/api/auth.test.ts",
+      "summary": "Unit tests for the auth session helpers (getStoredToken, getUser, storeSession, logout, getAuthHeaders), using an in-memory localStorage mock.",
+      "tags": [
+        "test",
+        "authentication"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/tests/api/client.test.ts",
+      "type": "file",
+      "name": "client.test.ts",
+      "filePath": "frontend/tests/api/client.test.ts",
+      "summary": "Unit tests for the makeClient API client covering all endpoint methods, error handling, auth header injection, and request construction.",
+      "tags": [
+        "test",
+        "api-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/tests/components/FilterBar.test.tsx",
+      "type": "file",
+      "name": "FilterBar.test.tsx",
+      "filePath": "frontend/tests/components/FilterBar.test.tsx",
+      "summary": "Unit tests for the FilterBar component, verifying tab rendering, active tab highlighting, and onChange callback invocation.",
+      "tags": [
+        "test",
+        "component"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/tests/components/Header.test.tsx",
+      "type": "file",
+      "name": "Header.test.tsx",
+      "filePath": "frontend/tests/components/Header.test.tsx",
+      "summary": "Unit tests for the Header component, verifying user identity display and sign-out button behavior.",
+      "tags": [
+        "test",
+        "component"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/tests/components/SaleCard.test.tsx",
+      "type": "file",
+      "name": "SaleCard.test.tsx",
+      "filePath": "frontend/tests/components/SaleCard.test.tsx",
+      "summary": "Unit tests for the SaleCard component covering product rendering, purchase button states, and interaction with the purchase lifecycle via a fake client.",
+      "tags": [
+        "test",
+        "component"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/tests/hooks/useProductPurchase.test.ts",
+      "type": "file",
+      "name": "useProductPurchase.test.ts",
+      "filePath": "frontend/tests/hooks/useProductPurchase.test.ts",
+      "summary": "Unit tests for the useProductPurchase hook covering initial state, existing-purchase detection, and all purchase attempt outcomes (success, sold-out, duplicate, network error).",
+      "tags": [
+        "test",
+        "hook"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/tests/hooks/useSales.test.ts",
+      "type": "file",
+      "name": "useSales.test.ts",
+      "filePath": "frontend/tests/hooks/useSales.test.ts",
+      "summary": "Unit tests for the useSales polling hook verifying initial fetch, loading state transitions, error handling, and automatic polling behavior.",
+      "tags": [
+        "test",
+        "hook"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/tests/pages/HomePage.test.tsx",
+      "type": "file",
+      "name": "HomePage.test.tsx",
+      "filePath": "frontend/tests/pages/HomePage.test.tsx",
+      "summary": "Integration tests for the HomePage component verifying product grid rendering, filter behavior, loading skeletons, and sign-out flow.",
+      "tags": [
+        "test",
+        "component"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/tests/pages/LoginPage.test.tsx",
+      "type": "file",
+      "name": "LoginPage.test.tsx",
+      "filePath": "frontend/tests/pages/LoginPage.test.tsx",
+      "summary": "Integration tests for the LoginPage component verifying login, signup, and Google auth flows including error display and session storage.",
+      "tags": [
+        "test",
+        "authentication",
+        "component"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/tests/support/factories.ts",
+      "type": "file",
+      "name": "factories.ts",
+      "filePath": "frontend/tests/support/factories.ts",
+      "summary": "Test factory module exporting builder functions (mkSaleSnapshot, mkProduct, mkAttempt, mkRecord, makeFakeClient) that construct typed test fixtures and a vitest-mocked API client for use across test suites.",
+      "tags": [
+        "test",
+        "utility",
+        "factory"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/tests/support/factories.ts:mkProduct",
+      "type": "function",
+      "name": "mkProduct",
+      "filePath": "frontend/tests/support/factories.ts",
+      "lineRange": [
+        23,
+        34
+      ],
+      "summary": "Factory that builds a Product fixture with sensible defaults for price, stock, and embedded sale snapshot, accepting partial overrides.",
+      "tags": [
+        "test",
+        "factory"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/tests/support/factories.ts:makeFakeClient",
+      "type": "function",
+      "name": "makeFakeClient",
+      "filePath": "frontend/tests/support/factories.ts",
+      "lineRange": [
+        64,
+        74
+      ],
+      "summary": "Constructs a vitest-mocked API client with all methods replaced by vi.fn() stubs, returning sensible default resolved values for getProducts and attemptProductPurchase.",
+      "tags": [
+        "test",
+        "factory",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/tests/support/setup.ts",
+      "type": "file",
+      "name": "setup.ts",
+      "filePath": "frontend/tests/support/setup.ts",
+      "summary": "Vitest global test setup file that configures jsdom environment matchers (e.g. @testing-library/jest-dom) and any shared test lifecycle hooks for the frontend test suite.",
+      "tags": [
+        "test",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/scripts/bootstrap.ts",
+      "type": "file",
+      "name": "bootstrap.ts",
+      "filePath": "backend/scripts/bootstrap.ts",
+      "summary": "One-shot infrastructure bootstrapping script that waits for DynamoDB to become available, creates the purchases, products, and users tables if missing, seeds product data via DDB, and initializes Redis stock counters for all products.",
+      "tags": [
+        "script",
+        "infrastructure",
+        "database",
+        "entry-point",
+        "data-pipeline"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Uses a generic polling helper (waitFor) to handle DynamoDB local startup delays before issuing CreateTable commands."
+    },
+    {
+      "id": "function:backend/scripts/bootstrap.ts:purchasesTableSpec",
+      "type": "function",
+      "name": "purchasesTableSpec",
+      "filePath": "backend/scripts/bootstrap.ts",
+      "lineRange": [
+        22,
+        46
+      ],
+      "summary": "Returns the DynamoDB CreateTable parameter object for the purchases table, including GSI on userId and a TTL attribute.",
+      "tags": [
+        "database",
+        "schema-definition",
+        "factory"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/scripts/bootstrap.ts:productsTableSpec",
+      "type": "function",
+      "name": "productsTableSpec",
+      "filePath": "backend/scripts/bootstrap.ts",
+      "lineRange": [
+        48,
+        59
+      ],
+      "summary": "Returns the DynamoDB CreateTable parameter object for the products table keyed by productId.",
+      "tags": [
+        "database",
+        "schema-definition",
+        "factory"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/scripts/bootstrap.ts:usersTableSpec",
+      "type": "function",
+      "name": "usersTableSpec",
+      "filePath": "backend/scripts/bootstrap.ts",
+      "lineRange": [
+        61,
+        80
+      ],
+      "summary": "Returns the DynamoDB CreateTable parameter object for the users table, including a GSI on email for login lookups.",
+      "tags": [
+        "database",
+        "schema-definition",
+        "factory"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/scripts/bootstrap.ts:waitFor",
+      "type": "function",
+      "name": "waitFor",
+      "filePath": "backend/scripts/bootstrap.ts",
+      "lineRange": [
+        82,
+        94
+      ],
+      "summary": "Polls an async predicate function up to a configurable number of attempts with delay, throwing if it never resolves successfully.",
+      "tags": [
+        "utility",
+        "polling",
+        "resilience"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/scripts/bootstrap.ts:ensureTable",
+      "type": "function",
+      "name": "ensureTable",
+      "filePath": "backend/scripts/bootstrap.ts",
+      "lineRange": [
+        96,
+        112
+      ],
+      "summary": "Idempotently creates a DynamoDB table from a spec object, waiting for ACTIVE status after creation and skipping silently if the table already exists.",
+      "tags": [
+        "database",
+        "infrastructure",
+        "idempotent"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/scripts/bootstrap.ts:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "backend/scripts/bootstrap.ts",
+      "lineRange": [
+        114,
+        153
+      ],
+      "summary": "Orchestrates the full bootstrap sequence: connects to DynamoDB and Redis, ensures all three tables exist, persists seed products, and initializes stock counters before closing connections.",
+      "tags": [
+        "entry-point",
+        "orchestration",
+        "infrastructure"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:backend/scripts/seed.ts",
+      "type": "file",
+      "name": "seed.ts",
+      "filePath": "backend/scripts/seed.ts",
+      "summary": "Development utility script that resets the flash-sale state by clearing all purchase records from DynamoDB and resetting Redis stock counters back to their initial product quantities.",
+      "tags": [
+        "script",
+        "database",
+        "development",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/scripts/seed.ts:clearPurchases",
+      "type": "function",
+      "name": "clearPurchases",
+      "filePath": "backend/scripts/seed.ts",
+      "lineRange": [
+        20,
+        50
+      ],
+      "summary": "Scans and deletes all items from the purchases DynamoDB table in batches, then resets Redis stock counters for each seeded product.",
+      "tags": [
+        "database",
+        "utility",
+        "data-pipeline"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/src/api/app.ts",
+      "type": "file",
+      "name": "app.ts",
+      "filePath": "backend/src/api/app.ts",
+      "summary": "Express application factory that wires together all adapters (Redis, DynamoDB, SQS), builds per-product service instances for each product loaded from the database, registers middleware and routes, and returns a fully configured app.",
+      "tags": [
+        "entry-point",
+        "factory",
+        "middleware",
+        "api-handler"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Uses a Map keyed by productId to hold per-product sale and purchase service instances, enabling isolated concurrency control per product."
+    },
+    {
+      "id": "function:backend/src/api/app.ts:buildApp",
+      "type": "function",
+      "name": "buildApp",
+      "filePath": "backend/src/api/app.ts",
+      "lineRange": [
+        26,
+        103
+      ],
+      "summary": "Async factory function that initializes all infrastructure adapters, instantiates per-product services, configures Express middleware (helmet, cors, pino-http), mounts auth and product routes, and returns the Express application.",
+      "tags": [
+        "factory",
+        "api-handler",
+        "middleware",
+        "service"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:backend/src/api/handler.ts",
+      "type": "file",
+      "name": "handler.ts",
+      "filePath": "backend/src/api/handler.ts",
+      "summary": "AWS Lambda entry point that lazily initializes the Express app wrapped in serverless-http and exports a handler function compatible with API Gateway events.",
+      "tags": [
+        "entry-point",
+        "api-handler",
+        "service"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Lazy singleton pattern via a module-level promise ensures the Express app is built only once across warm Lambda invocations."
+    },
+    {
+      "id": "function:backend/src/api/handler.ts:handler",
+      "type": "function",
+      "name": "handler",
+      "filePath": "backend/src/api/handler.ts",
+      "lineRange": [
+        13,
+        16
+      ],
+      "summary": "Exported Lambda handler that awaits the lazy-initialized serverless-http adapter and forwards the API Gateway event and context to it.",
+      "tags": [
+        "entry-point",
+        "api-handler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/src/logger.ts",
+      "type": "file",
+      "name": "logger.ts",
+      "filePath": "backend/src/logger.ts",
+      "summary": "Exports a singleton pino logger instance configured from environment variables, used throughout the backend for structured JSON logging.",
+      "tags": [
+        "utility",
+        "singleton",
+        "service"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/tests/stress/verify-stress.ts",
+      "type": "file",
+      "name": "verify-stress.ts",
+      "filePath": "backend/tests/stress/verify-stress.ts",
+      "summary": "Post-stress-test verification script that queries DynamoDB purchase counts and compares Redis remaining stock against initial quantities to assert no overselling occurred across all products.",
+      "tags": [
+        "test",
+        "utility",
+        "data-pipeline",
+        "validation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:backend/tests/stress/verify-stress.ts:countDdbPurchases",
+      "type": "function",
+      "name": "countDdbPurchases",
+      "filePath": "backend/tests/stress/verify-stress.ts",
+      "lineRange": [
+        30,
+        55
+      ],
+      "summary": "Queries the DynamoDB purchases table for a specific productId and counts the total number of persisted purchase records.",
+      "tags": [
+        "test",
+        "database",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/scripts/products.ts",
+      "type": "file",
+      "name": "products.ts",
+      "filePath": "backend/scripts/products.ts",
+      "summary": "Defines and exports the seedProducts array containing multi-phase flash sale product fixtures with computed timestamps for upcoming, active, ended, and sold-out sale states; moved here from the deleted backend/src/products.ts to separate seed data from runtime code.",
+      "tags": [
+        "data-model",
+        "script",
+        "configuration",
+        "factory"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses helper functions h() and m() for hours/minutes in milliseconds and ts() to compute ISO timestamps relative to now, making sale windows easy to configure."
+    },
+    {
+      "id": "file:backend/src/api/routes/products.ts",
+      "type": "file",
+      "name": "products.ts",
+      "filePath": "backend/src/api/routes/products.ts",
+      "summary": "Express router factory that exposes GET /products (listing all products with their current sale phase status) and POST/GET /products/:id/purchase endpoints with Zod validation and auth middleware enforcement.",
+      "tags": [
+        "api-handler",
+        "middleware",
+        "validation",
+        "service"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:backend/src/api/routes/products.ts:makeProductRoutes",
+      "type": "function",
+      "name": "makeProductRoutes",
+      "filePath": "backend/src/api/routes/products.ts",
+      "lineRange": [
+        10,
+        93
+      ],
+      "summary": "Factory that returns an Express Router handling product listing (with sale phase enrichment), purchase attempts (with duplicate/stock-out/expired guards), and user purchase retrieval, all using per-product service instances.",
+      "tags": [
+        "api-handler",
+        "factory",
+        "validation",
+        "middleware"
+      ],
+      "complexity": "complex"
+    }
+  ],
+  "edges": [
+    {
+      "source": "pipeline:.github/workflows/StressTest.yml",
+      "target": "pipeline:.github/workflows/FullTest.yml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "pipeline:.github/workflows/FullTest.yml",
+      "target": "file:backend/src/config.ts",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "pipeline:.github/workflows/StressTest.yml",
+      "target": "file:backend/src/config.ts",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:backend/src/config.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/architecture.md",
+      "target": "file:backend/src/config.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/architecture.md",
+      "target": "file:backend/src/types/purchase.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/architecture.md",
+      "target": "file:backend/src/types/product.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/architecture.md",
+      "target": "file:backend/src/types/sale.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:backend/.env.example",
+      "target": "file:backend/src/config.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "service:backend/docker-compose.yml",
+      "target": "config:backend/elasticmq.conf",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:backend/serverless.yml",
+      "target": "file:backend/src/config.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:backend/tsconfig.json",
+      "target": "file:backend/src/config.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:backend/tsconfig.json",
+      "target": "file:backend/src/types/index.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:backend/package.json",
+      "target": "file:backend/src/config.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:backend/src/config.ts",
+      "target": "function:backend/src/config.ts:loadConfig",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/config.ts",
+      "target": "function:backend/src/config.ts:loadConfig",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/config.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/adapters.ts",
+      "target": "file:backend/src/types/product.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/adapters.ts",
+      "target": "file:backend/src/types/purchase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/adapters.ts",
+      "target": "file:backend/src/types/user.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/app.ts",
+      "target": "file:backend/src/types/adapters.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/app.ts",
+      "target": "file:backend/src/types/config.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/app.ts",
+      "target": "file:backend/src/types/product.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/app.ts",
+      "target": "file:backend/src/types/purchase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/app.ts",
+      "target": "file:backend/src/types/sale.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/index.ts",
+      "target": "file:backend/src/types/adapters.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/index.ts",
+      "target": "file:backend/src/types/app.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/index.ts",
+      "target": "file:backend/src/types/config.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/index.ts",
+      "target": "file:backend/src/types/product.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/index.ts",
+      "target": "file:backend/src/types/purchase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/index.ts",
+      "target": "file:backend/src/types/sale.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/index.ts",
+      "target": "file:backend/src/types/stock.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/index.ts",
+      "target": "file:backend/src/types/user.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/types/purchase.ts",
+      "target": "file:backend/src/types/sale.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/adapters/ddb.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/adapters/queue.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/adapters/redis.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/middleware/auth.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/routes/auth.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/services/purchaseService.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/services/saleService.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/services/stockService.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/services/userService.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/worker/handler.ts",
+      "target": "file:backend/src/adapters/ddb.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/worker/handler.ts",
+      "target": "file:backend/src/config.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/worker/handler.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/adapters/ddb.ts",
+      "target": "function:backend/src/adapters/ddb.ts:makeDdb",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/adapters/ddb.ts",
+      "target": "function:backend/src/adapters/ddb.ts:makeDdb",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/adapters/queue.ts",
+      "target": "function:backend/src/adapters/queue.ts:makeQueue",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/adapters/queue.ts",
+      "target": "function:backend/src/adapters/queue.ts:makeQueue",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/adapters/redis.ts",
+      "target": "function:backend/src/adapters/redis.ts:makeRedis",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/adapters/redis.ts",
+      "target": "function:backend/src/adapters/redis.ts:makeRedis",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/api/middleware/auth.ts",
+      "target": "function:backend/src/api/middleware/auth.ts:makeAuthMiddleware",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/api/middleware/auth.ts",
+      "target": "function:backend/src/api/middleware/auth.ts:makeAuthMiddleware",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/api/routes/auth.ts",
+      "target": "function:backend/src/api/routes/auth.ts:makeAuthRoutes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/api/routes/auth.ts",
+      "target": "function:backend/src/api/routes/auth.ts:makeAuthRoutes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/services/purchaseService.ts",
+      "target": "function:backend/src/services/purchaseService.ts:makeProductPurchaseService",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/services/purchaseService.ts",
+      "target": "function:backend/src/services/purchaseService.ts:makeProductPurchaseService",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/services/saleService.ts",
+      "target": "function:backend/src/services/saleService.ts:computeStatus",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/services/saleService.ts",
+      "target": "function:backend/src/services/saleService.ts:computeStatus",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/services/saleService.ts",
+      "target": "function:backend/src/services/saleService.ts:makeProductSaleService",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/services/saleService.ts",
+      "target": "function:backend/src/services/saleService.ts:makeProductSaleService",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/services/stockService.ts",
+      "target": "function:backend/src/services/stockService.ts:makeStockService",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/services/stockService.ts",
+      "target": "function:backend/src/services/stockService.ts:makeStockService",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/services/userService.ts",
+      "target": "function:backend/src/services/userService.ts:makeUserService",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/services/userService.ts",
+      "target": "function:backend/src/services/userService.ts:makeUserService",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/worker/handler.ts",
+      "target": "function:backend/src/worker/handler.ts:processRecord",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/worker/handler.ts",
+      "target": "function:backend/src/worker/handler.ts:handler",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:backend/src/worker/handler.ts",
+      "target": "function:backend/src/worker/handler.ts:handler",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "config:frontend/package.json",
+      "target": "file:frontend/index.html",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:backend/tests/integration/api.test.ts",
+      "target": "file:backend/src/services/stockService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/integration/api.test.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/services/stockService.ts",
+      "target": "file:backend/tests/integration/api.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:backend/tests/integration/worker.test.ts",
+      "target": "file:backend/src/worker/handler.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/worker/handler.ts",
+      "target": "file:backend/tests/integration/worker.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:backend/tests/unit/authMiddleware.test.ts",
+      "target": "file:backend/src/api/middleware/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/unit/authMiddleware.test.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/middleware/auth.ts",
+      "target": "file:backend/tests/unit/authMiddleware.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:backend/tests/unit/authRoutes.test.ts",
+      "target": "file:backend/src/api/routes/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/unit/authRoutes.test.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/routes/auth.ts",
+      "target": "file:backend/tests/unit/authRoutes.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:backend/tests/unit/productsRoutes.test.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/unit/purchaseService.test.ts",
+      "target": "file:backend/src/services/purchaseService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/unit/purchaseService.test.ts",
+      "target": "file:backend/src/services/saleService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/unit/purchaseService.test.ts",
+      "target": "file:backend/src/services/stockService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/unit/purchaseService.test.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/services/purchaseService.ts",
+      "target": "file:backend/tests/unit/purchaseService.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:backend/tests/unit/saleService.test.ts",
+      "target": "file:backend/src/services/saleService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/unit/saleService.test.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/services/saleService.ts",
+      "target": "file:backend/tests/unit/saleService.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:backend/tests/unit/stockService.test.ts",
+      "target": "file:backend/src/services/stockService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/unit/stockService.test.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/services/stockService.ts",
+      "target": "file:backend/tests/unit/stockService.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:backend/tests/unit/userService.test.ts",
+      "target": "file:backend/src/services/userService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/unit/userService.test.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/services/userService.ts",
+      "target": "file:backend/tests/unit/userService.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:frontend/tsconfig.json",
+      "target": "file:frontend/src/main.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:frontend/tsconfig.json",
+      "target": "file:frontend/src/App.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend/vitest.config.ts",
+      "target": "file:frontend/vite.config.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/vitest.config.ts",
+      "target": "file:frontend/vite.config.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend/src/types/index.ts",
+      "target": "file:frontend/src/types/purchase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/types/index.ts",
+      "target": "file:frontend/src/types/sale.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/types/index.ts",
+      "target": "file:frontend/src/types/user.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/types/purchase.ts",
+      "target": "file:frontend/src/types/sale.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/main.tsx",
+      "target": "file:frontend/src/App.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/App.tsx",
+      "target": "file:frontend/src/api/ApiProvider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/App.tsx",
+      "target": "file:frontend/src/api/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/App.tsx",
+      "target": "file:frontend/src/pages/HomePage.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/App.tsx",
+      "target": "file:frontend/src/pages/LoginPage.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/App.tsx",
+      "target": "file:frontend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/api/ApiProvider.tsx",
+      "target": "file:frontend/src/api/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/api/ApiProvider.tsx",
+      "target": "file:frontend/src/api/client.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/api/auth.ts",
+      "target": "file:frontend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/api/auth.ts",
+      "target": "function:frontend/src/api/auth.ts:storeSession",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/api/auth.ts",
+      "target": "function:frontend/src/api/auth.ts:storeSession",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/src/api/auth.ts",
+      "target": "function:frontend/src/api/auth.ts:getAuthHeaders",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/api/auth.ts",
+      "target": "function:frontend/src/api/auth.ts:getAuthHeaders",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/src/api/client.ts",
+      "target": "file:frontend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/api/client.ts",
+      "target": "class:frontend/src/api/client.ts:ApiError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/api/client.ts",
+      "target": "class:frontend/src/api/client.ts:ApiError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/src/api/client.ts",
+      "target": "function:frontend/src/api/client.ts:makeClient",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/api/client.ts",
+      "target": "function:frontend/src/api/client.ts:makeClient",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/src/components/FilterBar.tsx",
+      "target": "file:frontend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/components/FilterBar.tsx",
+      "target": "function:frontend/src/components/FilterBar.tsx:FilterBar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/components/FilterBar.tsx",
+      "target": "function:frontend/src/components/FilterBar.tsx:FilterBar",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/src/components/Header.tsx",
+      "target": "file:frontend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/components/Header.tsx",
+      "target": "function:frontend/src/components/Header.tsx:Header",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/components/Header.tsx",
+      "target": "function:frontend/src/components/Header.tsx:Header",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/src/components/SaleCard.tsx",
+      "target": "file:frontend/src/hooks/useProductPurchase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/components/SaleCard.tsx",
+      "target": "file:frontend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/components/SaleCard.tsx",
+      "target": "function:frontend/src/components/SaleCard.tsx:useCountdown",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/components/SaleCard.tsx",
+      "target": "function:frontend/src/components/SaleCard.tsx:StockBar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/components/SaleCard.tsx",
+      "target": "function:frontend/src/components/SaleCard.tsx:BuyButton",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/components/SaleCard.tsx",
+      "target": "function:frontend/src/components/SaleCard.tsx:SaleCard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/components/SaleCard.tsx",
+      "target": "function:frontend/src/components/SaleCard.tsx:SaleCard",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/src/hooks/useProductPurchase.ts",
+      "target": "file:frontend/src/api/ApiProvider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/hooks/useProductPurchase.ts",
+      "target": "file:frontend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/hooks/useProductPurchase.ts",
+      "target": "function:frontend/src/hooks/useProductPurchase.ts:useProductPurchase",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/hooks/useProductPurchase.ts",
+      "target": "function:frontend/src/hooks/useProductPurchase.ts:useProductPurchase",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/src/hooks/useSales.ts",
+      "target": "file:frontend/src/api/ApiProvider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/hooks/useSales.ts",
+      "target": "file:frontend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/hooks/useSales.ts",
+      "target": "function:frontend/src/hooks/useSales.ts:useSales",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/hooks/useSales.ts",
+      "target": "function:frontend/src/hooks/useSales.ts:useSales",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/src/pages/HomePage.tsx",
+      "target": "file:frontend/src/api/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/pages/HomePage.tsx",
+      "target": "file:frontend/src/components/FilterBar.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/pages/HomePage.tsx",
+      "target": "file:frontend/src/components/Header.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/pages/HomePage.tsx",
+      "target": "file:frontend/src/components/SaleCard.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/pages/HomePage.tsx",
+      "target": "file:frontend/src/hooks/useSales.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/pages/HomePage.tsx",
+      "target": "file:frontend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/pages/HomePage.tsx",
+      "target": "function:frontend/src/pages/HomePage.tsx:HomePage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/pages/HomePage.tsx",
+      "target": "function:frontend/src/pages/HomePage.tsx:HomePage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/src/pages/LoginPage.tsx",
+      "target": "file:frontend/src/api/ApiProvider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/pages/LoginPage.tsx",
+      "target": "file:frontend/src/api/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/pages/LoginPage.tsx",
+      "target": "file:frontend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/pages/LoginPage.tsx",
+      "target": "function:frontend/src/pages/LoginPage.tsx:LoginPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/src/pages/LoginPage.tsx",
+      "target": "function:frontend/src/pages/LoginPage.tsx:LoginPage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/tests/App.test.tsx",
+      "target": "file:frontend/src/App.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/App.test.tsx",
+      "target": "file:frontend/src/api/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/App.tsx",
+      "target": "file:frontend/tests/App.test.tsx",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend/tests/api/ApiProvider.test.tsx",
+      "target": "file:frontend/src/api/ApiProvider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/api/ApiProvider.test.tsx",
+      "target": "file:frontend/tests/support/factories.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/api/ApiProvider.tsx",
+      "target": "file:frontend/tests/api/ApiProvider.test.tsx",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend/tests/api/auth.test.ts",
+      "target": "file:frontend/src/api/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/api/auth.test.ts",
+      "target": "file:frontend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/api/auth.ts",
+      "target": "file:frontend/tests/api/auth.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend/tests/api/client.test.ts",
+      "target": "file:frontend/src/api/client.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/api/client.test.ts",
+      "target": "file:frontend/tests/support/factories.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/api/client.ts",
+      "target": "file:frontend/tests/api/client.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend/tests/components/FilterBar.test.tsx",
+      "target": "file:frontend/src/components/FilterBar.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/components/FilterBar.tsx",
+      "target": "file:frontend/tests/components/FilterBar.test.tsx",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend/tests/components/Header.test.tsx",
+      "target": "file:frontend/src/components/Header.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/components/Header.tsx",
+      "target": "file:frontend/tests/components/Header.test.tsx",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend/tests/components/SaleCard.test.tsx",
+      "target": "file:frontend/src/api/ApiProvider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/components/SaleCard.test.tsx",
+      "target": "file:frontend/src/components/SaleCard.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/components/SaleCard.test.tsx",
+      "target": "file:frontend/tests/support/factories.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/components/SaleCard.tsx",
+      "target": "file:frontend/tests/components/SaleCard.test.tsx",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend/tests/hooks/useProductPurchase.test.ts",
+      "target": "file:frontend/src/api/ApiProvider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/hooks/useProductPurchase.test.ts",
+      "target": "file:frontend/src/hooks/useProductPurchase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/hooks/useProductPurchase.test.ts",
+      "target": "file:frontend/tests/support/factories.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/hooks/useProductPurchase.ts",
+      "target": "file:frontend/tests/hooks/useProductPurchase.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend/tests/hooks/useSales.test.ts",
+      "target": "file:frontend/src/api/ApiProvider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/hooks/useSales.test.ts",
+      "target": "file:frontend/src/hooks/useSales.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/hooks/useSales.test.ts",
+      "target": "file:frontend/tests/support/factories.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/hooks/useSales.ts",
+      "target": "file:frontend/tests/hooks/useSales.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend/tests/pages/HomePage.test.tsx",
+      "target": "file:frontend/src/api/ApiProvider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/pages/HomePage.test.tsx",
+      "target": "file:frontend/src/api/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/pages/HomePage.test.tsx",
+      "target": "file:frontend/src/pages/HomePage.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/pages/HomePage.test.tsx",
+      "target": "file:frontend/tests/support/factories.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/pages/HomePage.tsx",
+      "target": "file:frontend/tests/pages/HomePage.test.tsx",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend/tests/pages/LoginPage.test.tsx",
+      "target": "file:frontend/src/api/ApiProvider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/pages/LoginPage.test.tsx",
+      "target": "file:frontend/src/api/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/pages/LoginPage.test.tsx",
+      "target": "file:frontend/src/pages/LoginPage.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/pages/LoginPage.test.tsx",
+      "target": "file:frontend/tests/support/factories.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/src/pages/LoginPage.tsx",
+      "target": "file:frontend/tests/pages/LoginPage.test.tsx",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend/tests/support/factories.ts",
+      "target": "file:frontend/src/api/client.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/support/factories.ts",
+      "target": "file:frontend/src/types/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/tests/support/factories.ts",
+      "target": "function:frontend/tests/support/factories.ts:mkProduct",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/tests/support/factories.ts",
+      "target": "function:frontend/tests/support/factories.ts:mkProduct",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/tests/support/factories.ts",
+      "target": "function:frontend/tests/support/factories.ts:makeFakeClient",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:frontend/tests/support/factories.ts",
+      "target": "function:frontend/tests/support/factories.ts:makeFakeClient",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/scripts/bootstrap.ts",
+      "target": "function:backend/scripts/bootstrap.ts:purchasesTableSpec",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/scripts/bootstrap.ts",
+      "target": "function:backend/scripts/bootstrap.ts:productsTableSpec",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/scripts/bootstrap.ts",
+      "target": "function:backend/scripts/bootstrap.ts:usersTableSpec",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/scripts/bootstrap.ts",
+      "target": "function:backend/scripts/bootstrap.ts:waitFor",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/scripts/bootstrap.ts",
+      "target": "function:backend/scripts/bootstrap.ts:ensureTable",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/scripts/bootstrap.ts",
+      "target": "function:backend/scripts/bootstrap.ts:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/scripts/bootstrap.ts",
+      "target": "file:backend/src/config.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/scripts/bootstrap.ts",
+      "target": "file:backend/src/adapters/redis.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/scripts/bootstrap.ts",
+      "target": "file:backend/src/adapters/ddb.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/scripts/bootstrap.ts",
+      "target": "file:backend/src/services/stockService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/scripts/bootstrap.ts",
+      "target": "file:backend/scripts/products.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/scripts/bootstrap.ts",
+      "target": "file:backend/src/logger.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/scripts/seed.ts",
+      "target": "function:backend/scripts/seed.ts:clearPurchases",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/scripts/seed.ts",
+      "target": "file:backend/src/config.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/scripts/seed.ts",
+      "target": "file:backend/src/adapters/redis.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/scripts/seed.ts",
+      "target": "file:backend/src/services/stockService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/scripts/seed.ts",
+      "target": "file:backend/scripts/products.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/scripts/seed.ts",
+      "target": "file:backend/src/logger.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "function:backend/src/api/app.ts:buildApp",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "function:backend/src/api/app.ts:buildApp",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "file:backend/src/adapters/ddb.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "file:backend/src/adapters/queue.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "file:backend/src/adapters/redis.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "file:backend/src/config.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "file:backend/src/logger.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "file:backend/src/services/purchaseService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "file:backend/src/services/saleService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "file:backend/src/services/stockService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "file:backend/src/services/userService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "file:backend/src/api/middleware/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "file:backend/src/api/routes/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/app.ts",
+      "target": "file:backend/src/api/routes/products.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/handler.ts",
+      "target": "function:backend/src/api/handler.ts:handler",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/src/api/handler.ts",
+      "target": "function:backend/src/api/handler.ts:handler",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/src/api/handler.ts",
+      "target": "file:backend/src/api/app.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/handler.ts",
+      "target": "file:backend/src/api/app.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:backend/tests/stress/verify-stress.ts",
+      "target": "function:backend/tests/stress/verify-stress.ts:countDdbPurchases",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/tests/stress/verify-stress.ts",
+      "target": "file:backend/src/config.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/stress/verify-stress.ts",
+      "target": "file:backend/src/adapters/redis.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/stress/verify-stress.ts",
+      "target": "file:backend/src/services/stockService.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/stress/verify-stress.ts",
+      "target": "file:backend/scripts/products.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/tests/stress/verify-stress.ts",
+      "target": "file:backend/src/logger.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/routes/products.ts",
+      "target": "function:backend/src/api/routes/products.ts:makeProductRoutes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/src/api/routes/products.ts",
+      "target": "function:backend/src/api/routes/products.ts:makeProductRoutes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/scripts/products.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "outbound",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/src/api/routes/products.ts",
+      "target": "file:backend/src/types/index.ts",
+      "type": "imports",
+      "direction": "outbound",
+      "weight": 0.7
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:infrastructure",
+      "name": "Infrastructure & Configuration",
+      "description": "Deployment orchestration, Serverless Framework configuration, CI/CD pipelines, ElasticMQ queue setup, environment templates, and Node.js version pinning.",
+      "nodeIds": [
+        "pipeline:.github/workflows/FullTest.yml",
+        "pipeline:.github/workflows/StressTest.yml",
+        "service:backend/docker-compose.yml",
+        "config:backend/serverless.yml",
+        "config:backend/elasticmq.conf",
+        "config:.nvmrc"
+      ]
+    },
+    {
+      "id": "layer:documentation",
+      "name": "Documentation",
+      "description": "Project overview and comprehensive architecture reference.",
+      "nodeIds": [
+        "document:README.md",
+        "document:docs/architecture.md"
+      ]
+    },
+    {
+      "id": "layer:backend-types",
+      "name": "Backend Type Definitions",
+      "description": "Shared TypeScript interfaces and domain contracts for configuration, adapters, products, purchases, sales, stock, and users.",
+      "nodeIds": [
+        "file:backend/src/types/adapters.ts",
+        "file:backend/src/types/app.ts",
+        "file:backend/src/types/config.ts",
+        "file:backend/src/types/index.ts",
+        "file:backend/src/types/product.ts",
+        "file:backend/src/types/purchase.ts",
+        "file:backend/src/types/sale.ts",
+        "file:backend/src/types/stock.ts",
+        "file:backend/src/types/user.ts"
+      ]
+    },
+    {
+      "id": "layer:backend-core",
+      "name": "Backend Core",
+      "description": "Business logic services, infrastructure adapters (DynamoDB, SQS, Redis), shared utilities (config loader, logger), and seed data.",
+      "nodeIds": [
+        "config:backend/package.json",
+        "config:backend/tsconfig.json",
+        "config:backend/.env.example",
+        "file:backend/tsup.config.ts",
+        "file:backend/src/config.ts",
+        "file:backend/src/logger.ts",
+        "file:backend/src/adapters/ddb.ts",
+        "file:backend/src/adapters/queue.ts",
+        "file:backend/src/adapters/redis.ts",
+        "file:backend/src/services/purchaseService.ts",
+        "file:backend/src/services/saleService.ts",
+        "file:backend/src/services/stockService.ts",
+        "file:backend/src/services/userService.ts",
+        "file:backend/src/worker/handler.ts",
+        "file:backend/scripts/products.ts"
+      ]
+    },
+    {
+      "id": "layer:backend-api",
+      "name": "Backend API & Entry Points",
+      "description": "Express application factory, Lambda handler, JWT auth middleware, REST route handlers, SQS worker, and operational scripts.",
+      "nodeIds": [
+        "file:backend/src/api/app.ts",
+        "file:backend/src/api/handler.ts",
+        "file:backend/src/api/middleware/auth.ts",
+        "file:backend/src/api/routes/auth.ts",
+        "file:backend/src/api/routes/products.ts",
+        "file:backend/scripts/bootstrap.ts",
+        "file:backend/scripts/seed.ts"
+      ]
+    },
+    {
+      "id": "layer:backend-test",
+      "name": "Backend Tests",
+      "description": "Unit, integration, and stress-test suites covering all backend services, API routes, middleware, and the SQS worker.",
+      "nodeIds": [
+        "config:backend/tests/stress/flash-sale.yml",
+        "file:backend/tests/stress/generate-user.ts",
+        "file:backend/tests/stress/verify-stress.ts",
+        "file:backend/tests/integration/api.test.ts",
+        "file:backend/tests/integration/worker.test.ts",
+        "file:backend/tests/unit/authMiddleware.test.ts",
+        "file:backend/tests/unit/authRoutes.test.ts",
+        "file:backend/tests/unit/productsRoutes.test.ts",
+        "file:backend/tests/unit/purchaseService.test.ts",
+        "file:backend/tests/unit/saleService.test.ts",
+        "file:backend/tests/unit/stockService.test.ts",
+        "file:backend/tests/unit/userService.test.ts"
+      ]
+    },
+    {
+      "id": "layer:frontend-app",
+      "name": "Frontend Application",
+      "description": "React + Vite single-page application including root entry, page components, hooks, API client, and type definitions.",
+      "nodeIds": [
+        "file:frontend/index.html",
+        "config:frontend/package.json",
+        "config:frontend/tsconfig.json",
+        "file:frontend/vite.config.ts",
+        "file:frontend/vitest.config.ts",
+        "file:frontend/src/vite-env.d.ts",
+        "file:frontend/src/types/index.ts",
+        "file:frontend/src/types/purchase.ts",
+        "file:frontend/src/types/sale.ts",
+        "file:frontend/src/types/user.ts",
+        "file:frontend/src/styles/global.css",
+        "file:frontend/src/components/Header.module.css",
+        "file:frontend/src/main.tsx",
+        "file:frontend/src/App.tsx",
+        "file:frontend/src/api/ApiProvider.tsx",
+        "file:frontend/src/api/auth.ts",
+        "file:frontend/src/api/client.ts",
+        "file:frontend/src/components/FilterBar.tsx",
+        "file:frontend/src/components/Header.tsx",
+        "file:frontend/src/components/SaleCard.tsx",
+        "file:frontend/src/hooks/useProductPurchase.ts",
+        "file:frontend/src/hooks/useSales.ts",
+        "file:frontend/src/pages/HomePage.tsx",
+        "file:frontend/src/pages/LoginPage.tsx"
+      ]
+    },
+    {
+      "id": "layer:frontend-test",
+      "name": "Frontend Tests",
+      "description": "Vitest unit and integration test suites for all React components, hooks, pages, and the API client layer.",
+      "nodeIds": [
+        "file:frontend/tests/App.test.tsx",
+        "file:frontend/tests/api/ApiProvider.test.tsx",
+        "file:frontend/tests/api/auth.test.ts",
+        "file:frontend/tests/api/client.test.ts",
+        "file:frontend/tests/components/FilterBar.test.tsx",
+        "file:frontend/tests/components/Header.test.tsx",
+        "file:frontend/tests/components/SaleCard.test.tsx",
+        "file:frontend/tests/hooks/useProductPurchase.test.ts",
+        "file:frontend/tests/hooks/useSales.test.ts",
+        "file:frontend/tests/pages/HomePage.test.tsx",
+        "file:frontend/tests/pages/LoginPage.test.tsx",
+        "file:frontend/tests/support/factories.ts",
+        "file:frontend/tests/support/setup.ts"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Project Overview",
+      "description": "Start with the README to understand what flash-sale is and why it exists: a high-concurrency flash sale platform engineered to prevent overselling and duplicate purchases at scale. It introduces the full stack at a glance \u2014 Express API, Redis Lua stock gating, SQS async persistence, DynamoDB, and a React + Vite frontend \u2014 giving you a mental map before any code is opened. The architecture document in docs/ extends this into a full reference.",
+      "nodeIds": [
+        "document:README.md",
+        "document:docs/architecture.md"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Local Infrastructure",
+      "description": "Before the code can run, three stateful services must be available: Redis (stock counter), ElasticMQ (SQS-compatible queue), and DynamoDB Local (order persistence). The docker-compose file spins all three up with a single command, and elasticmq.conf declares the queue name and settings that the application code will reference by name. Understanding this layer first explains why the backend has three separate adapters.",
+      "nodeIds": [
+        "service:backend/docker-compose.yml",
+        "config:backend/elasticmq.conf"
+      ],
+      "languageLesson": "docker-compose `depends_on` controls startup order but does not guarantee readiness \u2014 the bootstrap script (Step 5) compensates by polling DynamoDB until it responds before proceeding."
+    },
+    {
+      "order": 3,
+      "title": "Shared Type System",
+      "description": "The backend's entire vocabulary is defined in `src/types/` and re-exported through a barrel index. `SalePhase` (`upcoming/active/sold_out/ended`) is the central discriminated union that flows from the database seed through the service layer to the API response and all the way into the frontend. Reading these interfaces before the implementation files makes every later step easier to follow.",
+      "nodeIds": [
+        "file:backend/src/types/index.ts",
+        "file:backend/src/types/sale.ts",
+        "file:backend/src/types/product.ts",
+        "file:backend/src/types/purchase.ts"
+      ],
+      "languageLesson": "TypeScript discriminated unions (a `type` or `phase` literal field on each variant) let the compiler narrow types exhaustively inside `switch` statements, eliminating a whole class of runtime bugs that plague dynamically-typed flash sale code."
+    },
+    {
+      "order": 4,
+      "title": "Product Seed Data",
+      "description": "The product catalog lives in `backend/scripts/products.ts` \u2014 not in a database table and not in `src/`. This deliberate placement (moved here from the deleted `src/products.ts`) means seed data is a dev-time script concern rather than a runtime import, keeping the production bundle lean. The file exports a `seedProducts` array typed against the interfaces from Step 3, and it is imported by the bootstrap script, the seed script, and the stress-test verifier \u2014 making it the single source of truth for all environment setup.",
+      "nodeIds": [
+        "file:backend/scripts/products.ts"
+      ],
+      "languageLesson": "Separating seed data into a scripts/ directory enforces the distinction between build-time artifacts and runtime code. tsup's bundle config excludes this directory so it never ships to Lambda."
+    },
+    {
+      "order": 5,
+      "title": "Bootstrap & Seed Scripts",
+      "description": "The bootstrap script is the one-shot initialization run once per environment: it polls until DynamoDB Local responds, creates the orders table, and loads the seed products from Step 4 into Redis stock counters. The seed script is the developer's reset button \u2014 it flushes purchase state and re-seeds stock without recreating the table. Both share the same config, Redis adapter, and stockService, illustrating how the same infrastructure code is reused across operational scripts and the production API.",
+      "nodeIds": [
+        "file:backend/scripts/bootstrap.ts",
+        "file:backend/scripts/seed.ts"
+      ]
+    },
+    {
+      "order": 6,
+      "title": "Infrastructure Adapters",
+      "description": "Three factory modules \u2014 `redis.ts`, `ddb.ts`, and `queue.ts` \u2014 each wrap a third-party client (ioredis, AWS DynamoDB SDK, AWS SQS SDK) and return a typed interface defined in the `adapters.ts` type file. This adapter pattern means the rest of the codebase never imports AWS SDKs directly; it depends on the interfaces, making the services trivially swappable with mocks in tests. Redis has the highest fan-in in the entire graph (4 importers) because stock gating touches nearly every flow.",
+      "nodeIds": [
+        "file:backend/src/adapters/redis.ts",
+        "file:backend/src/adapters/ddb.ts",
+        "file:backend/src/adapters/queue.ts",
+        "file:backend/src/types/adapters.ts"
+      ],
+      "languageLesson": "Factory functions (functions that return typed objects rather than classes) are idiomatic in TypeScript Node services: they compose cleanly with dependency injection, avoid `this`-binding pitfalls, and make each adapter independently testable by accepting config as a parameter."
+    },
+    {
+      "order": 7,
+      "title": "Core Business Services",
+      "description": "Three services contain all the flash-sale business logic. `stockService.ts` manages Redis stock counters using atomic Lua scripts that simultaneously check remaining stock, prevent duplicate purchases by tracking a per-user buyer set, and decrement \u2014 all in a single round-trip that cannot be interrupted. `saleService.ts` computes the current SalePhase (from Step 3's union type) for each product based on wall-clock time. `purchaseService.ts` orchestrates the full purchase flow: gate via stockService, then enqueue to SQS, returning an outcome the route handler can return immediately to the client.",
+      "nodeIds": [
+        "file:backend/src/services/stockService.ts",
+        "file:backend/src/services/saleService.ts",
+        "file:backend/src/services/purchaseService.ts"
+      ],
+      "languageLesson": "Redis Lua scripts run atomically on the server \u2014 no other command can interleave between the stock-check and the decrement. This is the key correctness guarantee for a flash sale: even under thousands of concurrent requests, each unit of stock is sold exactly once."
+    },
+    {
+      "order": 8,
+      "title": "Async Order Worker",
+      "description": "The SQS Lambda worker (`src/worker/handler.ts`) is the other half of the purchase flow. Once a purchase is reserved in Redis, the main API responds to the user immediately while this Lambda processes the SQS message and writes a durable record to DynamoDB \u2014 decoupling the fast path (user response in <10ms) from the slow path (database write, retryable). This is the architecture's key scalability decision: Redis handles concurrency, DynamoDB handles durability, and SQS bridges them.",
+      "nodeIds": [
+        "file:backend/src/worker/handler.ts"
+      ],
+      "languageLesson": "SQS standard queues deliver at-least-once \u2014 the worker must be idempotent. Using the user+product pair as a DynamoDB condition expression prevents double-writes even if the same message is processed twice."
+    },
+    {
+      "order": 9,
+      "title": "Express App & API Routes",
+      "description": "The Express factory in `src/api/app.ts` is the architectural hub of the backend \u2014 it has the highest fan-out in the graph (12 outbound imports), wiring every adapter, service, middleware, and route together into a single composable function. The products route (`routes/products.ts`) exposes two endpoints: `GET /products` returns all products with their computed SalePhase and current stock, and `POST /products/:id/purchase` triggers the purchase flow from Step 7. The auth middleware validates JWTs before any purchase attempt.",
+      "nodeIds": [
+        "file:backend/src/api/app.ts",
+        "file:backend/src/api/routes/products.ts",
+        "file:backend/src/api/middleware/auth.ts",
+        "file:backend/src/api/routes/auth.ts"
+      ]
+    },
+    {
+      "order": 10,
+      "title": "Lambda Entry Point & Deployment",
+      "description": "The API Lambda handler (`src/api/handler.ts`) wraps the Express app from Step 9 in `serverless-http`, converting API Gateway events into Express request/response objects. The Serverless Framework config (`serverless.yml`) declares both Lambda functions \u2014 the API handler and the SQS worker \u2014 their IAM permissions, SQS event source mapping, and environment variable bindings. This is how the monolithic Express app becomes a serverless lambdalith deployment.",
+      "nodeIds": [
+        "file:backend/src/api/handler.ts",
+        "config:backend/serverless.yml"
+      ],
+      "languageLesson": "The lambdalith pattern runs a full Express app inside a single Lambda function rather than splitting routes into individual functions. It trades per-route isolation for simpler deployment, faster cold starts (one bundle to load), and the ability to run the same app locally with `node` during development."
+    },
+    {
+      "order": 11,
+      "title": "Frontend Entry & App Shell",
+      "description": "The React frontend starts at `frontend/src/main.tsx`, which mounts the `App` component into the HTML shell's root div. `App.tsx` owns the top-level auth state \u2014 it reads the stored JWT on load, decides whether to render the `LoginPage` or `HomePage`, and passes down the `onLogin`/`onLogout` callbacks. The `ApiProvider` wraps the tree with a React context holding the shared `ApiClient` instance so all child components can make authenticated API calls without prop drilling.",
+      "nodeIds": [
+        "file:frontend/src/main.tsx",
+        "file:frontend/src/App.tsx",
+        "file:frontend/src/api/ApiProvider.tsx",
+        "file:frontend/src/api/auth.ts"
+      ],
+      "languageLesson": "React context + a provider component is the standard pattern for dependency injection in React: create the shared object once at the top of the tree (ApiProvider), expose it via context, and any descendant can access it with `useContext` \u2014 no prop threading required."
+    },
+    {
+      "order": 12,
+      "title": "Product Listing & Purchase UI",
+      "description": "The `HomePage` composes three UI building blocks: `Header` (navigation + auth status), `FilterBar` (tabs for each SalePhase from Step 3), and a grid of `SaleCard` components. Each `SaleCard` renders a product's countdown timer and a purchase button. The `useSales` hook polls `GET /products` on a schedule to keep stock and phase information fresh without a full page reload. The `useProductPurchase` hook manages the per-card purchase lifecycle \u2014 loading state, error display, and the POST request.",
+      "nodeIds": [
+        "file:frontend/src/pages/HomePage.tsx",
+        "file:frontend/src/components/SaleCard.tsx",
+        "file:frontend/src/components/FilterBar.tsx",
+        "file:frontend/src/hooks/useSales.ts",
+        "file:frontend/src/hooks/useProductPurchase.ts"
+      ],
+      "languageLesson": "Separating data-fetching hooks (`useSales`, `useProductPurchase`) from presentational components (`SaleCard`, `FilterBar`) is a React best practice: components remain pure render functions, hooks own side effects, and both can be tested independently."
+    },
+    {
+      "order": 13,
+      "title": "CI/CD & Stress Testing",
+      "description": "The project ships with two GitHub Actions pipelines: `FullTest.yml` runs the full unit and integration test suite on every push, and `StressTest.yml` fires Artillery load tests to validate that the Redis Lua gating holds under concurrent pressure. The Artillery config (`flash-sale.yml`) defines the concurrency profile, and `verify-stress.ts` \u2014 which imports from `scripts/products.ts` \u2014 cross-checks DynamoDB purchase counts against the expected stock to confirm no overselling occurred.",
+      "nodeIds": [
+        "pipeline:.github/workflows/FullTest.yml",
+        "pipeline:.github/workflows/StressTest.yml",
+        "config:backend/tests/stress/flash-sale.yml",
+        "file:backend/tests/stress/verify-stress.ts"
+      ],
+      "languageLesson": "Stress tests for a flash sale must verify not just throughput but correctness: the verifier script reads both the Redis remaining-stock counter and the DynamoDB order count and asserts `initial_stock == purchases + remaining`. This proves the atomic Lua script never double-sold."
+    }
+  ]
+}

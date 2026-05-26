@@ -21,7 +21,7 @@ import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { loadConfig } from '../../src/config';
 import { makeRedis } from '../../src/adapters/redis';
 import { makeStockService } from '../../src/services/stockService';
-import { mockProducts } from '../../src/products';
+import { seedProducts } from '../../scripts/products';
 import logger from '../../src/logger';
 
 // Must match the product ID in flash-sale.yml
@@ -58,9 +58,9 @@ async function countDdbPurchases(
   const config = loadConfig();
   const redis = makeRedis({ config, logger });
 
-  const product = mockProducts.find(p => p.id === STRESS_PRODUCT_ID);
+  const product = seedProducts.find(p => p.id === STRESS_PRODUCT_ID);
   if (!product) {
-    console.error(`✗ Product ${STRESS_PRODUCT_ID} not found in mockProducts`);
+    console.error(`✗ Product ${STRESS_PRODUCT_ID} not found in seedProducts`);
     await redis.quit();
     process.exit(1);
   }

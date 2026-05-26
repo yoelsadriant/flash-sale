@@ -1,0 +1,3377 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "a132916226e23f3d9e8352d1164b5ea0fba7d196",
+  "generatedAt": "2026-05-26T13:23:52.276Z",
+  "files": {
+    "frontend/src/components/Header.module.css": {
+      "filePath": "frontend/src/components/Header.module.css",
+      "contentHash": "31196342256a2180e97670febaadb03cc777af7603bf5bb79c56ab19484c8397",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 95,
+      "hasStructuralAnalysis": false
+    },
+    "frontend/src/components/FilterBar.tsx": {
+      "filePath": "frontend/src/components/FilterBar.tsx",
+      "contentHash": "a4a1de387a144dcbd8e0ed966c121debc13e1e86a7c03ddac83d068a2470d272",
+      "functions": [
+        {
+          "name": "FilterBar",
+          "params": [
+            "{ active, onChange }"
+          ],
+          "exported": true,
+          "lineCount": 31
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types",
+          "specifiers": [
+            "FilterKey"
+          ]
+        }
+      ],
+      "exports": [
+        "FilterBar"
+      ],
+      "totalLines": 47,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/components/Header.tsx": {
+      "filePath": "frontend/src/components/Header.tsx",
+      "contentHash": "ee4d7d652fab5d3b292cebc2cba2e542cbba2bed134e728b19d5fc46cefae5b4",
+      "functions": [
+        {
+          "name": "Header",
+          "params": [
+            "{ user, onSignOut }"
+          ],
+          "exported": true,
+          "lineCount": 73
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "Header"
+      ],
+      "totalLines": 82,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/components/SaleCard.tsx": {
+      "filePath": "frontend/src/components/SaleCard.tsx",
+      "contentHash": "54268df342eb03a3671e28a80c8235e2d6c60b4c17f91ef8b31c0df69d234108",
+      "functions": [
+        {
+          "name": "discountPct",
+          "params": [
+            "original",
+            "sale"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "useCountdown",
+          "params": [
+            "target"
+          ],
+          "exported": false,
+          "lineCount": 17
+        },
+        {
+          "name": "Countdown",
+          "params": [
+            "{ target, label }"
+          ],
+          "exported": false,
+          "lineCount": 14
+        },
+        {
+          "name": "StockBar",
+          "params": [
+            "{ stock, initialStock }"
+          ],
+          "exported": false,
+          "lineCount": 26
+        },
+        {
+          "name": "BuyButton",
+          "params": [
+            "{\n  status, phase, onBuy,\n}"
+          ],
+          "exported": false,
+          "lineCount": 92
+        },
+        {
+          "name": "SaleCard",
+          "params": [
+            "{ product, userId }"
+          ],
+          "exported": true,
+          "lineCount": 114
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useEffect",
+            "useState"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "Product"
+          ]
+        },
+        {
+          "source": "../hooks/useProductPurchase",
+          "specifiers": [
+            "useProductPurchase"
+          ]
+        }
+      ],
+      "exports": [
+        "SaleCard"
+      ],
+      "totalLines": 289,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/hooks/useProductPurchase.ts": {
+      "filePath": "frontend/src/hooks/useProductPurchase.ts",
+      "contentHash": "a9e2fc0b68f7f5b2d45581f7d1d41ed765c23cbb8b62522d9941dddbb281bc23",
+      "functions": [
+        {
+          "name": "useProductPurchase",
+          "params": [
+            "productId",
+            "userId"
+          ],
+          "exported": true,
+          "lineCount": 48
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useCallback",
+            "useEffect",
+            "useState"
+          ]
+        },
+        {
+          "source": "../api/ApiProvider",
+          "specifiers": [
+            "useApi"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "PurchaseState"
+          ]
+        }
+      ],
+      "exports": [
+        "useProductPurchase"
+      ],
+      "totalLines": 53,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/hooks/useSales.ts": {
+      "filePath": "frontend/src/hooks/useSales.ts",
+      "contentHash": "ba6a6efde753fff267673810f14f57277e10368718773005ab35e68e0d8e6a55",
+      "functions": [
+        {
+          "name": "useSales",
+          "params": [],
+          "exported": true,
+          "lineCount": 43
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useCallback",
+            "useEffect",
+            "useRef",
+            "useState"
+          ]
+        },
+        {
+          "source": "../api/ApiProvider",
+          "specifiers": [
+            "useApi"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "Product"
+          ]
+        }
+      ],
+      "exports": [
+        "useSales"
+      ],
+      "totalLines": 48,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/vite-env.d.ts": {
+      "filePath": "frontend/src/vite-env.d.ts",
+      "contentHash": "630690a2764d6ec9c128f7a27ab70f0d71b77f36433e8702f685d5d20bf33060",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 9,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/api/ApiProvider.tsx": {
+      "filePath": "frontend/src/api/ApiProvider.tsx",
+      "contentHash": "834195c27005a9c2711f5d9e183e8fcf58b45492ce0062df0c73c33e110d5c9b",
+      "functions": [
+        {
+          "name": "ApiProvider",
+          "params": [
+            "{\n  client = defaultClient,\n  children,\n}"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "useApi",
+          "params": [],
+          "returnType": "ApiClient",
+          "exported": true,
+          "lineCount": 3
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "createContext",
+            "useContext",
+            "ReactNode"
+          ]
+        },
+        {
+          "source": "./client",
+          "specifiers": [
+            "makeClient",
+            "ApiClient"
+          ]
+        },
+        {
+          "source": "./auth",
+          "specifiers": [
+            "getAuthHeaders"
+          ]
+        }
+      ],
+      "exports": [
+        "ApiProvider",
+        "useApi"
+      ],
+      "totalLines": 22,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/api/auth.ts": {
+      "filePath": "frontend/src/api/auth.ts",
+      "contentHash": "9876506b7c28c63207c2ec48ed624eeb8c005473c365bd24b01714424a974db7",
+      "functions": [
+        {
+          "name": "getStoredToken",
+          "params": [],
+          "returnType": "string | null",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "getUser",
+          "params": [],
+          "returnType": "User | null",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "storeSession",
+          "params": [
+            "token",
+            "user"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "logout",
+          "params": [],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "getAuthHeaders",
+          "params": [],
+          "returnType": "Record<string, string>",
+          "exported": true,
+          "lineCount": 5
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types",
+          "specifiers": [
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "getStoredToken",
+        "getUser",
+        "storeSession",
+        "logout",
+        "getAuthHeaders"
+      ],
+      "totalLines": 31,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/api/client.ts": {
+      "filePath": "frontend/src/api/client.ts",
+      "contentHash": "0c3ebce999853ab3b3b1ef01dbf7f2094a439461bdc8b879719b247803570401",
+      "functions": [
+        {
+          "name": "makeClient",
+          "params": [
+            "{\n  baseUrl = BASE,\n  authHeaders = () => ({}),\n  fetchImpl = fetch,\n}"
+          ],
+          "exported": true,
+          "lineCount": 83
+        }
+      ],
+      "classes": [
+        {
+          "name": "ApiError",
+          "methods": [
+            "constructor"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 6
+        }
+      ],
+      "imports": [
+        {
+          "source": "@/types",
+          "specifiers": [
+            "Product",
+            "PurchaseAttemptResult",
+            "UserPurchaseRecord",
+            "AuthResponse"
+          ]
+        }
+      ],
+      "exports": [
+        "ApiError",
+        "makeClient"
+      ],
+      "totalLines": 107,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/main.tsx": {
+      "filePath": "frontend/src/main.tsx",
+      "contentHash": "6c37bdc1db39e76e4202e9ae3a1f9d85e1662c3167e986dc351fa8b99c56829c",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "StrictMode"
+          ]
+        },
+        {
+          "source": "react-dom/client",
+          "specifiers": [
+            "createRoot"
+          ]
+        },
+        {
+          "source": "./styles/global.css",
+          "specifiers": []
+        },
+        {
+          "source": "./App",
+          "specifiers": [
+            "App"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/styles/global.css": {
+      "filePath": "frontend/src/styles/global.css",
+      "contentHash": "7bcf49930b82ea9f05536976d63dcec670d35abf1b8003155cac40ed822057fb",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 56,
+      "hasStructuralAnalysis": false
+    },
+    "frontend/src/pages/HomePage.tsx": {
+      "filePath": "frontend/src/pages/HomePage.tsx",
+      "contentHash": "5a4d0d62288ebb2af69d71636b68e19abbfaccac3789c9c9d3f8b6f46fe99c31",
+      "functions": [
+        {
+          "name": "HomePage",
+          "params": [
+            "{ user, onSignOut }"
+          ],
+          "exported": true,
+          "lineCount": 90
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "User",
+            "SalePhase",
+            "FilterKey"
+          ]
+        },
+        {
+          "source": "../hooks/useSales",
+          "specifiers": [
+            "useSales"
+          ]
+        },
+        {
+          "source": "../components/Header",
+          "specifiers": [
+            "Header"
+          ]
+        },
+        {
+          "source": "../components/FilterBar",
+          "specifiers": [
+            "FilterBar"
+          ]
+        },
+        {
+          "source": "../components/SaleCard",
+          "specifiers": [
+            "SaleCard"
+          ]
+        },
+        {
+          "source": "../api/auth",
+          "specifiers": [
+            "logout"
+          ]
+        }
+      ],
+      "exports": [
+        "HomePage"
+      ],
+      "totalLines": 105,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/pages/LoginPage.tsx": {
+      "filePath": "frontend/src/pages/LoginPage.tsx",
+      "contentHash": "39a998e5a3f0ba50cb60c348cb08212e551451549932aa2371bde7d64409f73f",
+      "functions": [
+        {
+          "name": "LoginPage",
+          "params": [
+            "{ onAuth }"
+          ],
+          "exported": true,
+          "lineCount": 256
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "FormEvent"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "../api/ApiProvider",
+          "specifiers": [
+            "useApi"
+          ]
+        },
+        {
+          "source": "../api/auth",
+          "specifiers": [
+            "storeSession"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "LoginPage"
+      ],
+      "totalLines": 269,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/App.tsx": {
+      "filePath": "frontend/src/App.tsx",
+      "contentHash": "a6dd684f3e3dfb34d64be98f469d6dd2e8b07980599025e221fb945b7a2adbbc",
+      "functions": [
+        {
+          "name": "App",
+          "params": [],
+          "exported": true,
+          "lineCount": 23
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "BrowserRouter",
+            "Routes",
+            "Route",
+            "Navigate"
+          ]
+        },
+        {
+          "source": "./api/ApiProvider",
+          "specifiers": [
+            "ApiProvider"
+          ]
+        },
+        {
+          "source": "./pages/HomePage",
+          "specifiers": [
+            "HomePage"
+          ]
+        },
+        {
+          "source": "./pages/LoginPage",
+          "specifiers": [
+            "LoginPage"
+          ]
+        },
+        {
+          "source": "./api/auth",
+          "specifiers": [
+            "getUser"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "App"
+      ],
+      "totalLines": 32,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/types/index.ts": {
+      "filePath": "frontend/src/types/index.ts",
+      "contentHash": "a6613a0599a24634cfa990809e1809bae84ced8a2a5336816adc32ab5ff07a2a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 4,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/types/purchase.ts": {
+      "filePath": "frontend/src/types/purchase.ts",
+      "contentHash": "b86903686b0d14a3b2d8506c40eb7ebdc067dc87ca1e671545a6ab1f35f49b99",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./sale",
+          "specifiers": [
+            "SaleSnapshot"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 44,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/types/sale.ts": {
+      "filePath": "frontend/src/types/sale.ts",
+      "contentHash": "bf930770d6055c61c77193f6452ffa2b0712fe27428ca291d29bdcb9d416d02f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/src/types/user.ts": {
+      "filePath": "frontend/src/types/user.ts",
+      "contentHash": "ccd607232ef2e793f689696a0066e50128b13d783cca399b9b4a88645f6375fa",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 10,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/public/favicon.svg": {
+      "filePath": "frontend/public/favicon.svg",
+      "contentHash": "ef6b85dd2434b743956b20f536647c8cf7d48dc301bc35a2685c3549da212d9a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 5,
+      "hasStructuralAnalysis": false
+    },
+    "frontend/.gitignore": {
+      "filePath": "frontend/.gitignore",
+      "contentHash": "e90a7281dbb5e0e7f44c10a4e21694d4a93e1256d7869f06389fab4816cd6d8d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8,
+      "hasStructuralAnalysis": false
+    },
+    "frontend/index.html": {
+      "filePath": "frontend/index.html",
+      "contentHash": "a638d8bd373c53e279fe7d913e145465218a57bcb33c17fa57355c980c3934fe",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 22,
+      "hasStructuralAnalysis": false
+    },
+    "frontend/tests/App.test.tsx": {
+      "filePath": "frontend/tests/App.test.tsx",
+      "contentHash": "4a1399937fe31d6770d973be32d5b71c9efc7f4f68e9875ffd3ff2022703d246",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "test",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen"
+          ]
+        },
+        {
+          "source": "../src/App",
+          "specifiers": [
+            "App"
+          ]
+        },
+        {
+          "source": "../src/api/auth",
+          "specifiers": [
+            "getUser"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 66,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tests/api/ApiProvider.test.tsx": {
+      "filePath": "frontend/tests/api/ApiProvider.test.tsx",
+      "contentHash": "e74156e4be84930cb45ee1d7c0526a351b8ad6eef1c34c085a43db53f6d6d841",
+      "functions": [
+        {
+          "name": "ClientConsumer",
+          "params": [],
+          "exported": false,
+          "lineCount": 4
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "test",
+            "expect"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen"
+          ]
+        },
+        {
+          "source": "../../src/api/ApiProvider",
+          "specifiers": [
+            "ApiProvider",
+            "useApi"
+          ]
+        },
+        {
+          "source": "../support/factories",
+          "specifiers": [
+            "makeFakeClient"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 39,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tests/api/client.test.ts": {
+      "filePath": "frontend/tests/api/client.test.ts",
+      "contentHash": "4049615f17d0692999328a828ee98fa6cead57db04445395bfbe7c58305563c2",
+      "functions": [
+        {
+          "name": "mockFetch",
+          "params": [
+            "resolutions"
+          ],
+          "returnType": "typeof fetch",
+          "exported": false,
+          "lineCount": 9
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "test",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "../../src/api/client",
+          "specifiers": [
+            "makeClient",
+            "ApiError"
+          ]
+        },
+        {
+          "source": "../support/factories",
+          "specifiers": [
+            "mkProduct",
+            "mkAttempt",
+            "mkRecord"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 126,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tests/api/auth.test.ts": {
+      "filePath": "frontend/tests/api/auth.test.ts",
+      "contentHash": "67a1044094d98ce986fd427c84d5dcd0fcd0e2dddcf416f4301420c2ce4f2d2e",
+      "functions": [
+        {
+          "name": "makeLocalStorageMock",
+          "params": [],
+          "exported": false,
+          "lineCount": 9
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "test",
+            "expect",
+            "beforeEach",
+            "vi"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "User"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 68,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tests/components/FilterBar.test.tsx": {
+      "filePath": "frontend/tests/components/FilterBar.test.tsx",
+      "contentHash": "6bc729e2d0844d4157a976d686aa94bdc09ed2f288a7dc3fc82aa0066ba6517f",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "test",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen",
+            "fireEvent"
+          ]
+        },
+        {
+          "source": "../../src/components/FilterBar",
+          "specifiers": [
+            "FilterBar"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 41,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tests/components/Header.test.tsx": {
+      "filePath": "frontend/tests/components/Header.test.tsx",
+      "contentHash": "90d6314560943ab20c0df83214a99c8efc2638011fc3f8931338573bec8b0448",
+      "functions": [
+        {
+          "name": "renderHeader",
+          "params": [
+            "user",
+            "onSignOut"
+          ],
+          "exported": false,
+          "lineCount": 7
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "test",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen",
+            "fireEvent"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "MemoryRouter"
+          ]
+        },
+        {
+          "source": "../../src/components/Header",
+          "specifiers": [
+            "Header"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 45,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tests/components/SaleCard.test.tsx": {
+      "filePath": "frontend/tests/components/SaleCard.test.tsx",
+      "contentHash": "2443872725cf75ea8630c91efbf6e3bf3e8ed0e397a06fa2f36d9fbeb5272dea",
+      "functions": [
+        {
+          "name": "renderCard",
+          "params": [
+            "productOverrides",
+            "clientOverrides",
+            "userId"
+          ],
+          "exported": false,
+          "lineCount": 12
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "test",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen",
+            "fireEvent",
+            "waitFor"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "MemoryRouter"
+          ]
+        },
+        {
+          "source": "../../src/components/SaleCard",
+          "specifiers": [
+            "SaleCard"
+          ]
+        },
+        {
+          "source": "../../src/api/ApiProvider",
+          "specifiers": [
+            "ApiProvider"
+          ]
+        },
+        {
+          "source": "../support/factories",
+          "specifiers": [
+            "makeFakeClient",
+            "mkProduct",
+            "mkAttempt",
+            "mkRecord"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 143,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tests/hooks/useProductPurchase.test.ts": {
+      "filePath": "frontend/tests/hooks/useProductPurchase.test.ts",
+      "contentHash": "2b55238f4b4b8f05b6f46f04bb88860d9861dc2270e13173115d7be385665c64",
+      "functions": [
+        {
+          "name": "makeWrapper",
+          "params": [
+            "client"
+          ],
+          "exported": false,
+          "lineCount": 4
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "test",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "renderHook",
+            "act",
+            "waitFor"
+          ]
+        },
+        {
+          "source": "react",
+          "specifiers": [
+            "createElement",
+            "ReactNode"
+          ]
+        },
+        {
+          "source": "../../src/api/ApiProvider",
+          "specifiers": [
+            "ApiProvider"
+          ]
+        },
+        {
+          "source": "../../src/hooks/useProductPurchase",
+          "specifiers": [
+            "useProductPurchase"
+          ]
+        },
+        {
+          "source": "../support/factories",
+          "specifiers": [
+            "makeFakeClient",
+            "mkAttempt",
+            "mkRecord"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 139,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tests/hooks/useSales.test.ts": {
+      "filePath": "frontend/tests/hooks/useSales.test.ts",
+      "contentHash": "3d921c269b15fd508619c11a2cf466d6c763bd446508c997a6b6672eb99a6edf",
+      "functions": [
+        {
+          "name": "makeWrapper",
+          "params": [
+            "client"
+          ],
+          "exported": false,
+          "lineCount": 4
+        },
+        {
+          "name": "flush",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "test",
+            "expect",
+            "vi",
+            "beforeEach",
+            "afterEach"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "renderHook",
+            "act"
+          ]
+        },
+        {
+          "source": "react",
+          "specifiers": [
+            "createElement"
+          ]
+        },
+        {
+          "source": "../../src/api/ApiProvider",
+          "specifiers": [
+            "ApiProvider"
+          ]
+        },
+        {
+          "source": "../../src/hooks/useSales",
+          "specifiers": [
+            "useSales"
+          ]
+        },
+        {
+          "source": "../support/factories",
+          "specifiers": [
+            "makeFakeClient",
+            "mkProduct"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 79,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tests/pages/HomePage.test.tsx": {
+      "filePath": "frontend/tests/pages/HomePage.test.tsx",
+      "contentHash": "6ebf46a5838a5459681e9f6ee8863ac7a98d559b0f0e4fa7dd87f25e19e5e310",
+      "functions": [
+        {
+          "name": "renderHome",
+          "params": [
+            "clientOverrides",
+            "onSignOut"
+          ],
+          "exported": false,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "test",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen",
+            "fireEvent",
+            "waitFor"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "MemoryRouter"
+          ]
+        },
+        {
+          "source": "../../src/api/ApiProvider",
+          "specifiers": [
+            "ApiProvider"
+          ]
+        },
+        {
+          "source": "../../src/pages/HomePage",
+          "specifiers": [
+            "HomePage"
+          ]
+        },
+        {
+          "source": "../support/factories",
+          "specifiers": [
+            "makeFakeClient",
+            "mkProduct"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 76,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tests/pages/LoginPage.test.tsx": {
+      "filePath": "frontend/tests/pages/LoginPage.test.tsx",
+      "contentHash": "b71d17612c8f3bd8e3fdc304e3b32e8c8147836e20542c3775f78d36aa410576",
+      "functions": [
+        {
+          "name": "renderLogin",
+          "params": [
+            "clientOverrides",
+            "onAuth"
+          ],
+          "exported": false,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "fireEvent",
+            "render",
+            "screen",
+            "waitFor"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "MemoryRouter"
+          ]
+        },
+        {
+          "source": "vitest",
+          "specifiers": [
+            "beforeEach",
+            "describe",
+            "expect",
+            "test",
+            "vi"
+          ]
+        },
+        {
+          "source": "../../src/api/ApiProvider",
+          "specifiers": [
+            "ApiProvider"
+          ]
+        },
+        {
+          "source": "../../src/pages/LoginPage",
+          "specifiers": [
+            "LoginPage"
+          ]
+        },
+        {
+          "source": "../support/factories",
+          "specifiers": [
+            "makeFakeClient"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 97,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tests/support/setup.ts": {
+      "filePath": "frontend/tests/support/setup.ts",
+      "contentHash": "dbbf1a83be2b817f0f99602d965f3bc3a59bb9119ee0662953187c80d26404db",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@testing-library/jest-dom/vitest",
+          "specifiers": []
+        },
+        {
+          "source": "vitest",
+          "specifiers": [
+            "afterEach",
+            "vi"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "cleanup"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 24,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tests/support/factories.ts": {
+      "filePath": "frontend/tests/support/factories.ts",
+      "contentHash": "bd3ae375062798bfa92dbdd779c55d7503262af299cf4b1108663e97ef4feca9",
+      "functions": [
+        {
+          "name": "mkSaleSnapshot",
+          "params": [
+            "over"
+          ],
+          "returnType": "SaleSnapshot",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "mkProduct",
+          "params": [
+            "over"
+          ],
+          "returnType": "Product",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "mkAttempt",
+          "params": [
+            "over"
+          ],
+          "returnType": "PurchaseAttemptResult",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "mkRecord",
+          "params": [
+            "over"
+          ],
+          "returnType": "UserPurchaseRecord",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "makeFakeClient",
+          "params": [
+            "overrides"
+          ],
+          "returnType": "ApiClient",
+          "exported": true,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types",
+          "specifiers": [
+            "SaleSnapshot",
+            "Product",
+            "PurchaseAttemptResult",
+            "UserPurchaseRecord"
+          ]
+        },
+        {
+          "source": "../../src/api/client",
+          "specifiers": [
+            "ApiClient"
+          ]
+        },
+        {
+          "source": "vitest",
+          "specifiers": [
+            "vi"
+          ]
+        }
+      ],
+      "exports": [
+        "mkSaleSnapshot",
+        "mkProduct",
+        "mkAttempt",
+        "mkRecord",
+        "makeFakeClient"
+      ],
+      "totalLines": 75,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/vitest.config.ts": {
+      "filePath": "frontend/vitest.config.ts",
+      "contentHash": "f58ffb49465bc381b49f90989c39f8da5c4fae487cd5e9c9dc301f0c535b3e51",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest/config",
+          "specifiers": [
+            "defineConfig",
+            "mergeConfig"
+          ]
+        },
+        {
+          "source": "./vite.config",
+          "specifiers": [
+            "viteConfig"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/package.json": {
+      "filePath": "frontend/package.json",
+      "contentHash": "d1ac8a916c606bb5f85d98f69d382d052d23952c6189f45f57a70787f3d63d7d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 33,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/tsconfig.json": {
+      "filePath": "frontend/tsconfig.json",
+      "contentHash": "ebc14627d775c4a294d77ea74b80d9395b5c703a430708dbce598b1dfa901777",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/vite.config.ts": {
+      "filePath": "frontend/vite.config.ts",
+      "contentHash": "1e177820b581ece9ba69595ad0b2fdfaf41d4a6fc28f913bdde08415b85dae96",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vite",
+          "specifiers": [
+            "defineConfig"
+          ]
+        },
+        {
+          "source": "@vitejs/plugin-react",
+          "specifiers": [
+            "react"
+          ]
+        },
+        {
+          "source": "path",
+          "specifiers": [
+            "resolve"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 30,
+      "hasStructuralAnalysis": true
+    },
+    "frontend/package-lock.json": {
+      "filePath": "frontend/package-lock.json",
+      "contentHash": "b9c1f692db349c57acc279d5e4dae184a4a9d7896d328a3c17b8a15f6e9bc754",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 4623,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/services/purchaseService.ts": {
+      "filePath": "backend/src/services/purchaseService.ts",
+      "contentHash": "f860bd49686fab6e14e8440f312b7046339dadd1789d8aef89fcd12822565545",
+      "functions": [
+        {
+          "name": "makeProductPurchaseService",
+          "params": [
+            "{\n  stockService,\n  saleService,\n  ddb,\n  queue,\n  product,\n  clock = () => new Date(),\n}"
+          ],
+          "returnType": "PurchaseService",
+          "exported": true,
+          "lineCount": 54
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "uuid",
+          "specifiers": [
+            "uuidv4"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "PurchaseAttemptResult",
+            "PurchaseRecord",
+            "PurchaseService",
+            "StockService",
+            "SaleService",
+            "Ddb",
+            "Queue",
+            "Product"
+          ]
+        }
+      ],
+      "exports": [
+        "makeProductPurchaseService"
+      ],
+      "totalLines": 81,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/services/saleService.ts": {
+      "filePath": "backend/src/services/saleService.ts",
+      "contentHash": "c308b0d3b8f4761b2de46d29b250a950cf89ba28e4770b2b810c1adbbba436f7",
+      "functions": [
+        {
+          "name": "computeStatus",
+          "params": [
+            "{\n  now,\n  saleStart,\n  saleEnd,\n  stock,\n}"
+          ],
+          "returnType": "SalePhase",
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "makeProductSaleService",
+          "params": [
+            "{\n  stockService,\n  product,\n  clock = () => new Date(),\n}"
+          ],
+          "returnType": "SaleService",
+          "exported": true,
+          "lineCount": 31
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types",
+          "specifiers": [
+            "SaleSnapshot",
+            "SaleService",
+            "StockService",
+            "Product",
+            "SalePhase"
+          ]
+        }
+      ],
+      "exports": [
+        "computeStatus",
+        "makeProductSaleService"
+      ],
+      "totalLines": 51,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/services/stockService.ts": {
+      "filePath": "backend/src/services/stockService.ts",
+      "contentHash": "83f249122ad0eeaca0ca022bef32f01e65404c6cd2f6adcf21b96f1d78445312",
+      "functions": [
+        {
+          "name": "makeStockService",
+          "params": [
+            "{\n  redis,\n  saleId,\n}"
+          ],
+          "returnType": "StockService",
+          "exported": true,
+          "lineCount": 67
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "ioredis",
+          "specifiers": [
+            "Redis"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "StockService",
+            "StockReserveResult"
+          ]
+        }
+      ],
+      "exports": [
+        "RESERVE_LUA",
+        "RELEASE_LUA",
+        "makeStockService"
+      ],
+      "totalLines": 129,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/services/userService.ts": {
+      "filePath": "backend/src/services/userService.ts",
+      "contentHash": "d6e0cd14d8c064dc2696c4e662c414d588bc9c7a7668301605115515fc3ad9c1",
+      "functions": [
+        {
+          "name": "makeUserService",
+          "params": [
+            "{\n  ddb,\n  config,\n  logger,\n}"
+          ],
+          "returnType": "UserService",
+          "exported": true,
+          "lineCount": 99
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "bcryptjs",
+          "specifiers": [
+            "bcrypt"
+          ]
+        },
+        {
+          "source": "jsonwebtoken",
+          "specifiers": [
+            "jwt"
+          ]
+        },
+        {
+          "source": "crypto",
+          "specifiers": [
+            "randomUUID"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "Ddb",
+            "Config",
+            "UserRecord",
+            "UserService",
+            "JwtPayload",
+            "PublicUser",
+            "AppLogger"
+          ]
+        }
+      ],
+      "exports": [
+        "makeUserService"
+      ],
+      "totalLines": 116,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/worker/handler.ts": {
+      "filePath": "backend/src/worker/handler.ts",
+      "contentHash": "47a6168ab3dd520082036e8d93c86df94f8e9f5198f18c4f1636c03f7873b167",
+      "functions": [
+        {
+          "name": "processRecord",
+          "params": [
+            "record"
+          ],
+          "returnType": "Promise<void>",
+          "exported": false,
+          "lineCount": 23
+        },
+        {
+          "name": "handler",
+          "params": [
+            "event"
+          ],
+          "returnType": "Promise<SQSBatchResponse>",
+          "exported": true,
+          "lineCount": 17
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "aws-lambda",
+          "specifiers": [
+            "SQSEvent",
+            "SQSBatchResponse",
+            "SQSRecord"
+          ]
+        },
+        {
+          "source": "../config",
+          "specifiers": [
+            "loadConfig"
+          ]
+        },
+        {
+          "source": "../logger",
+          "specifiers": [
+            "logger"
+          ]
+        },
+        {
+          "source": "../adapters/ddb",
+          "specifiers": [
+            "makeDdb"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "PurchaseMessage"
+          ]
+        }
+      ],
+      "exports": [
+        "handler"
+      ],
+      "totalLines": 61,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/api/middleware/auth.ts": {
+      "filePath": "backend/src/api/middleware/auth.ts",
+      "contentHash": "f7718a445f787c50656913a99482ef290b2755e72c94daf7259f95006ef4f851",
+      "functions": [
+        {
+          "name": "makeAuthMiddleware",
+          "params": [
+            "{\n  config,\n  logger,\n}"
+          ],
+          "returnType": "RequestHandler",
+          "exported": true,
+          "lineCount": 72
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Request",
+            "Response",
+            "NextFunction",
+            "RequestHandler"
+          ]
+        },
+        {
+          "source": "aws-jwt-verify",
+          "specifiers": [
+            "CognitoJwtVerifier"
+          ]
+        },
+        {
+          "source": "jsonwebtoken",
+          "specifiers": [
+            "jwt"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "Config",
+            "AuthedRequest",
+            "AppLogger"
+          ]
+        }
+      ],
+      "exports": [
+        "AuthedRequest",
+        "makeAuthMiddleware"
+      ],
+      "totalLines": 80,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/api/routes/auth.ts": {
+      "filePath": "backend/src/api/routes/auth.ts",
+      "contentHash": "71260e02ca2fc9b67bb5c26bc424dc8c4bc2460d80acc8126e62f8aa2e8bc6da",
+      "functions": [
+        {
+          "name": "makeAuthRoutes",
+          "params": [
+            "{ userService }"
+          ],
+          "returnType": "Router",
+          "exported": true,
+          "lineCount": 57
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Router",
+            "Request",
+            "Response"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "UserService"
+          ]
+        }
+      ],
+      "exports": [
+        "makeAuthRoutes"
+      ],
+      "totalLines": 66,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/api/routes/products.ts": {
+      "filePath": "backend/src/api/routes/products.ts",
+      "contentHash": "943ab683c087a615321363cfc64d3fd2c7e169d1277d4bdd2c48d8aa49a38de7",
+      "functions": [
+        {
+          "name": "makeProductRoutes",
+          "params": [
+            "{\n  productServices,\n  authMiddleware,\n}"
+          ],
+          "exported": true,
+          "lineCount": 84
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "express",
+            "Request",
+            "Response",
+            "NextFunction",
+            "RequestHandler"
+          ]
+        },
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "ProductContext",
+            "AuthedRequest"
+          ]
+        }
+      ],
+      "exports": [
+        "makeProductRoutes"
+      ],
+      "totalLines": 94,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/api/app.ts": {
+      "filePath": "backend/src/api/app.ts",
+      "contentHash": "dfed2653ad9111f65774df3167515b6429bfefbfa01026bb8fe6703b72d24dcb",
+      "functions": [
+        {
+          "name": "buildApp",
+          "params": [
+            "opts"
+          ],
+          "returnType": "Promise<AppWithDeps>",
+          "exported": true,
+          "lineCount": 78
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types",
+          "specifiers": [
+            "AppDeps",
+            "AppWithDeps",
+            "Config",
+            "Product",
+            "ProductContext"
+          ]
+        },
+        {
+          "source": "cors",
+          "specifiers": [
+            "cors"
+          ]
+        },
+        {
+          "source": "express",
+          "specifiers": [
+            "NextFunction",
+            "Request",
+            "Response"
+          ]
+        },
+        {
+          "source": "express",
+          "specifiers": [
+            "express"
+          ]
+        },
+        {
+          "source": "helmet",
+          "specifiers": [
+            "helmet"
+          ]
+        },
+        {
+          "source": "pino-http",
+          "specifiers": [
+            "pinoHttp"
+          ]
+        },
+        {
+          "source": "../adapters/ddb",
+          "specifiers": [
+            "makeDdb"
+          ]
+        },
+        {
+          "source": "../adapters/queue",
+          "specifiers": [
+            "makeQueue"
+          ]
+        },
+        {
+          "source": "../adapters/redis",
+          "specifiers": [
+            "makeRedis"
+          ]
+        },
+        {
+          "source": "../config",
+          "specifiers": [
+            "loadConfig"
+          ]
+        },
+        {
+          "source": "../logger",
+          "specifiers": [
+            "logger"
+          ]
+        },
+        {
+          "source": "../services/purchaseService",
+          "specifiers": [
+            "makeProductPurchaseService"
+          ]
+        },
+        {
+          "source": "../services/saleService",
+          "specifiers": [
+            "makeProductSaleService"
+          ]
+        },
+        {
+          "source": "../services/stockService",
+          "specifiers": [
+            "makeStockService"
+          ]
+        },
+        {
+          "source": "../services/userService",
+          "specifiers": [
+            "makeUserService"
+          ]
+        },
+        {
+          "source": "./middleware/auth",
+          "specifiers": [
+            "makeAuthMiddleware"
+          ]
+        },
+        {
+          "source": "./routes/auth",
+          "specifiers": [
+            "makeAuthRoutes"
+          ]
+        },
+        {
+          "source": "./routes/products",
+          "specifiers": [
+            "makeProductRoutes"
+          ]
+        }
+      ],
+      "exports": [
+        "buildApp"
+      ],
+      "totalLines": 104,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/api/handler.ts": {
+      "filePath": "backend/src/api/handler.ts",
+      "contentHash": "9d4141fa1df2e890a2b7d593b32b06051353708b51fb263346e0cc66f6dd252d",
+      "functions": [
+        {
+          "name": "getHandler",
+          "params": [],
+          "returnType": "Promise<ServerlessHandler>",
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "handler",
+          "params": [
+            "event",
+            "context"
+          ],
+          "exported": true,
+          "lineCount": 4
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "aws-lambda",
+          "specifiers": [
+            "Handler"
+          ]
+        },
+        {
+          "source": "serverless-http",
+          "specifiers": [
+            "serverless"
+          ]
+        },
+        {
+          "source": "./app",
+          "specifiers": [
+            "buildApp"
+          ]
+        }
+      ],
+      "exports": [
+        "handler"
+      ],
+      "totalLines": 17,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/adapters/ddb.ts": {
+      "filePath": "backend/src/adapters/ddb.ts",
+      "contentHash": "21f67ea00a6ca462328f2c8742b794588352547fea34d48c3a2e8a2728bda5b1",
+      "functions": [
+        {
+          "name": "makeDdb",
+          "params": [
+            "{\n  config,\n  logger,\n}"
+          ],
+          "returnType": "Ddb",
+          "exported": true,
+          "lineCount": 157
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@aws-sdk/client-dynamodb",
+          "specifiers": [
+            "DynamoDBClient"
+          ]
+        },
+        {
+          "source": "@aws-sdk/lib-dynamodb",
+          "specifiers": [
+            "DynamoDBDocumentClient",
+            "PutCommand",
+            "GetCommand",
+            "ScanCommand",
+            "QueryCommand",
+            "UpdateCommand"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "Config",
+            "Product",
+            "ProductRecord",
+            "PurchaseRecord",
+            "DdbWriteResult",
+            "UserRecord",
+            "Ddb",
+            "AppLogger"
+          ]
+        }
+      ],
+      "exports": [
+        "makeDdb"
+      ],
+      "totalLines": 181,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/adapters/queue.ts": {
+      "filePath": "backend/src/adapters/queue.ts",
+      "contentHash": "4de4f7ac8c672cb435aca4581cfcf749849623453ffde75d814f1ad9d5503efe",
+      "functions": [
+        {
+          "name": "makeQueue",
+          "params": [
+            "{\n  config,\n  logger,\n}"
+          ],
+          "returnType": "Queue",
+          "exported": true,
+          "lineCount": 33
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@aws-sdk/client-sqs",
+          "specifiers": [
+            "SQSClient",
+            "SendMessageCommand"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "Config",
+            "PurchaseMessage",
+            "Queue",
+            "AppLogger"
+          ]
+        }
+      ],
+      "exports": [
+        "makeQueue"
+      ],
+      "totalLines": 37,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/adapters/redis.ts": {
+      "filePath": "backend/src/adapters/redis.ts",
+      "contentHash": "0b08ab26f5db9b81021731ea24c7832e09c188d7d7584d309d09ded7b9e6fb57",
+      "functions": [
+        {
+          "name": "makeRedis",
+          "params": [
+            "{\n  config,\n  logger,\n}"
+          ],
+          "returnType": "Redis",
+          "exported": true,
+          "lineCount": 20
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "ioredis",
+          "specifiers": [
+            "Redis"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "Config",
+            "AppLogger"
+          ]
+        }
+      ],
+      "exports": [
+        "makeRedis"
+      ],
+      "totalLines": 24,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/config.ts": {
+      "filePath": "backend/src/config.ts",
+      "contentHash": "b52c46fdcd35b0a30868dad8b660dad6b982268475648334beaebaa7472bd7cc",
+      "functions": [
+        {
+          "name": "loadConfig",
+          "params": [
+            "env"
+          ],
+          "returnType": "Config",
+          "exported": true,
+          "lineCount": 33
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types",
+          "specifiers": [
+            "Config"
+          ]
+        }
+      ],
+      "exports": [
+        "loadConfig"
+      ],
+      "totalLines": 36,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/types/adapters.ts": {
+      "filePath": "backend/src/types/adapters.ts",
+      "contentHash": "3fec3222a75f882cbddcfe10dd6d603430f034f39ca0ba585cf913e14e0af7fb",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./product",
+          "specifiers": [
+            "Product",
+            "ProductRecord"
+          ]
+        },
+        {
+          "source": "./purchase",
+          "specifiers": [
+            "PurchaseRecord",
+            "PurchaseMessage"
+          ]
+        },
+        {
+          "source": "./user",
+          "specifiers": [
+            "UserRecord"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 30,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/types/app.ts": {
+      "filePath": "backend/src/types/app.ts",
+      "contentHash": "772224991763bdfeca80ebbb8beeebae761bd716945a1492e88bec655ff2d5d7",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pino",
+          "specifiers": [
+            "Logger"
+          ]
+        },
+        {
+          "source": "ioredis",
+          "specifiers": [
+            "Redis"
+          ]
+        },
+        {
+          "source": "express",
+          "specifiers": [
+            "Express",
+            "Request"
+          ]
+        },
+        {
+          "source": "./product",
+          "specifiers": [
+            "Product"
+          ]
+        },
+        {
+          "source": "./sale",
+          "specifiers": [
+            "SaleService"
+          ]
+        },
+        {
+          "source": "./purchase",
+          "specifiers": [
+            "PurchaseService"
+          ]
+        },
+        {
+          "source": "./adapters",
+          "specifiers": [
+            "Ddb",
+            "Queue"
+          ]
+        },
+        {
+          "source": "./config",
+          "specifiers": [
+            "Config"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 43,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/types/config.ts": {
+      "filePath": "backend/src/types/config.ts",
+      "contentHash": "4572399e62d5a5eeefb032abb62e187241aa13ced0872e6a1dbe62ee6696fe12",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/types/index.ts": {
+      "filePath": "backend/src/types/index.ts",
+      "contentHash": "df50fea09afdd7f7cf5b0e6215541eec63722ecbff38111a896b944c0cdb1bf0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 9,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/types/product.ts": {
+      "filePath": "backend/src/types/product.ts",
+      "contentHash": "1860162a947316b4386f9cc2038ddec3cb2d93a0908de63c07e0bff14e21428d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 24,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/types/purchase.ts": {
+      "filePath": "backend/src/types/purchase.ts",
+      "contentHash": "041383da51fe3db0285c993910cbf0de94bb4ba53026be3dd6c1c641fef00404",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./sale",
+          "specifiers": [
+            "SaleSnapshot"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 38,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/types/sale.ts": {
+      "filePath": "backend/src/types/sale.ts",
+      "contentHash": "3808739c4166b398ba350446de2fa63d1a2f7642519a621a796714acd0d15d91",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/types/stock.ts": {
+      "filePath": "backend/src/types/stock.ts",
+      "contentHash": "8960929361c37278520508e1c0434d6a4bcde1d45685a24f40e1bf9eec59b71f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 12,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/types/user.ts": {
+      "filePath": "backend/src/types/user.ts",
+      "contentHash": "370edeae05c6fd1674adec30d289373c182186d628e3834694eae6953ad10f63",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 36,
+      "hasStructuralAnalysis": true
+    },
+    "backend/src/logger.ts": {
+      "filePath": "backend/src/logger.ts",
+      "contentHash": "99d8052af2c30b063338dcf50a223b32e11bfb6ed7e868c043562b93c8dcc61c",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pino",
+          "specifiers": [
+            "pino",
+            "Logger"
+          ]
+        },
+        {
+          "source": "pino-pretty",
+          "specifiers": [
+            "pretty"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": true
+    },
+    "backend/scripts/products.ts": {
+      "filePath": "backend/scripts/products.ts",
+      "contentHash": "e33c96ff09dae17026bd778983e7b7203bd010171e557f5f99bf84802ac596c2",
+      "functions": [
+        {
+          "name": "ts",
+          "params": [
+            "offsetMs"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "h",
+          "params": [
+            "n"
+          ],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "m",
+          "params": [
+            "n"
+          ],
+          "exported": false,
+          "lineCount": 1
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../src/types",
+          "specifiers": [
+            "Product"
+          ]
+        }
+      ],
+      "exports": [
+        "seedProducts"
+      ],
+      "totalLines": 56,
+      "hasStructuralAnalysis": true
+    },
+    "backend/scripts/bootstrap.ts": {
+      "filePath": "backend/scripts/bootstrap.ts",
+      "contentHash": "60be3e05237912c7ee542e759b9c31950a3f966ddc243ebae55d28fe009c05b3",
+      "functions": [
+        {
+          "name": "purchasesTableSpec",
+          "params": [
+            "tableName"
+          ],
+          "returnType": "CreateTableCommandInput",
+          "exported": false,
+          "lineCount": 25
+        },
+        {
+          "name": "productsTableSpec",
+          "params": [
+            "tableName"
+          ],
+          "returnType": "CreateTableCommandInput",
+          "exported": false,
+          "lineCount": 12
+        },
+        {
+          "name": "usersTableSpec",
+          "params": [
+            "tableName"
+          ],
+          "returnType": "CreateTableCommandInput",
+          "exported": false,
+          "lineCount": 20
+        },
+        {
+          "name": "waitFor",
+          "params": [
+            "fn",
+            "{ label, attempts = 30, delayMs = 500 }"
+          ],
+          "returnType": "Promise<T>",
+          "exported": false,
+          "lineCount": 13
+        },
+        {
+          "name": "ensureTable",
+          "params": [
+            "client",
+            "spec"
+          ],
+          "returnType": "Promise<void>",
+          "exported": false,
+          "lineCount": 17
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": false,
+          "lineCount": 40
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@aws-sdk/client-dynamodb",
+          "specifiers": [
+            "DynamoDBClient",
+            "CreateTableCommand",
+            "DescribeTableCommand",
+            "ResourceInUseException",
+            "CreateTableCommandInput"
+          ]
+        },
+        {
+          "source": "../src/config",
+          "specifiers": [
+            "loadConfig"
+          ]
+        },
+        {
+          "source": "../src/adapters/redis",
+          "specifiers": [
+            "makeRedis"
+          ]
+        },
+        {
+          "source": "../src/adapters/ddb",
+          "specifiers": [
+            "makeDdb"
+          ]
+        },
+        {
+          "source": "../src/services/stockService",
+          "specifiers": [
+            "makeStockService"
+          ]
+        },
+        {
+          "source": "./products",
+          "specifiers": [
+            "seedProducts"
+          ]
+        },
+        {
+          "source": "../src/logger",
+          "specifiers": [
+            "logger"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 159,
+      "hasStructuralAnalysis": true
+    },
+    "backend/scripts/seed.ts": {
+      "filePath": "backend/scripts/seed.ts",
+      "contentHash": "6e9d66e634bd906556a63eb4fd6466d1b9ef90650899b6eb08b4376e6c06457e",
+      "functions": [
+        {
+          "name": "clearPurchases",
+          "params": [
+            "config"
+          ],
+          "exported": false,
+          "lineCount": 31
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@aws-sdk/client-dynamodb",
+          "specifiers": [
+            "DynamoDBClient",
+            "ScanCommand",
+            "DeleteItemCommand",
+            "AttributeValue"
+          ]
+        },
+        {
+          "source": "../src/config",
+          "specifiers": [
+            "loadConfig"
+          ]
+        },
+        {
+          "source": "../src/adapters/redis",
+          "specifiers": [
+            "makeRedis"
+          ]
+        },
+        {
+          "source": "../src/services/stockService",
+          "specifiers": [
+            "makeStockService"
+          ]
+        },
+        {
+          "source": "./products",
+          "specifiers": [
+            "seedProducts"
+          ]
+        },
+        {
+          "source": "../src/logger",
+          "specifiers": [
+            "logger"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 74,
+      "hasStructuralAnalysis": true
+    },
+    "backend/.gitignore": {
+      "filePath": "backend/.gitignore",
+      "contentHash": "dfeef237680fedd1299c9605b0e6f5c8c968d0bed24dd87209fb3e469d134105",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 13,
+      "hasStructuralAnalysis": false
+    },
+    "backend/tests/integration/api.test.ts": {
+      "filePath": "backend/tests/integration/api.test.ts",
+      "contentHash": "f41b5a1a4df6a940f3901fcb36ea6d49069c5d38113cbfa985e0bb651ad86d30",
+      "functions": [
+        {
+          "name": "makeFakeQueue",
+          "params": [],
+          "returnType": "Queue & { sent: PurchaseMessage[] }",
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "makeFakeDdb",
+          "params": [],
+          "returnType": "Ddb & { purchases: Map<string, PurchaseRecord> }",
+          "exported": false,
+          "lineCount": 26
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "supertest",
+          "specifiers": [
+            "request"
+          ]
+        },
+        {
+          "source": "ioredis-mock",
+          "specifiers": [
+            "RedisMock"
+          ]
+        },
+        {
+          "source": "ioredis",
+          "specifiers": [
+            "Redis"
+          ]
+        },
+        {
+          "source": "../../src/api/app",
+          "specifiers": [
+            "buildApp"
+          ]
+        },
+        {
+          "source": "../../src/services/stockService",
+          "specifiers": [
+            "makeStockService"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "AppWithDeps",
+            "Config",
+            "PurchaseRecord",
+            "PurchaseMessage",
+            "Ddb",
+            "Queue",
+            "Product"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 223,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tests/integration/worker.test.ts": {
+      "filePath": "backend/tests/integration/worker.test.ts",
+      "contentHash": "8ec15c39613b5f1e0765bf60bb0ca7cbe27d51f5ed7be0fc89a1d2dc9316ef6d",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "aws-sdk-client-mock",
+          "specifiers": [
+            "mockClient"
+          ]
+        },
+        {
+          "source": "@aws-sdk/lib-dynamodb",
+          "specifiers": [
+            "DynamoDBDocumentClient",
+            "PutCommand",
+            "UpdateCommand"
+          ]
+        },
+        {
+          "source": "aws-lambda",
+          "specifiers": [
+            "SQSEvent"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 128,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tests/unit/authMiddleware.test.ts": {
+      "filePath": "backend/tests/unit/authMiddleware.test.ts",
+      "contentHash": "ec39da95df85fcf204412006c45b23bc81c08545eae2ee542a6ffbbf72e96fd6",
+      "functions": [
+        {
+          "name": "mockRes",
+          "params": [],
+          "returnType": "MockRes",
+          "exported": false,
+          "lineCount": 14
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "express",
+          "specifiers": [
+            "Request",
+            "Response"
+          ]
+        },
+        {
+          "source": "jsonwebtoken",
+          "specifiers": [
+            "jwt"
+          ]
+        },
+        {
+          "source": "../../src/api/middleware/auth",
+          "specifiers": [
+            "makeAuthMiddleware"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "Config",
+            "MockRes",
+            "AppLogger"
+          ]
+        },
+        {
+          "source": "aws-jwt-verify",
+          "specifiers": [
+            "CognitoJwtVerifier"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 187,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tests/unit/authRoutes.test.ts": {
+      "filePath": "backend/tests/unit/authRoutes.test.ts",
+      "contentHash": "9036ff9ac68a3f14a6e3c7d28df5eab5c23e3d76ddd6002dacdff58fa8190db2",
+      "functions": [
+        {
+          "name": "makeUserSvc",
+          "params": [
+            "overrides"
+          ],
+          "returnType": "UserService",
+          "exported": false,
+          "lineCount": 9
+        },
+        {
+          "name": "makeApp",
+          "params": [
+            "svc"
+          ],
+          "exported": false,
+          "lineCount": 6
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "supertest",
+          "specifiers": [
+            "request"
+          ]
+        },
+        {
+          "source": "express",
+          "specifiers": [
+            "express"
+          ]
+        },
+        {
+          "source": "../../src/api/routes/auth",
+          "specifiers": [
+            "makeAuthRoutes"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "UserService",
+            "PublicUser"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 120,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tests/unit/productsRoutes.test.ts": {
+      "filePath": "backend/tests/unit/productsRoutes.test.ts",
+      "contentHash": "1e6474d2bed0ca9cd185270d89d8bc9960dc7f41057ebe23c608f58df3d471ca",
+      "functions": [
+        {
+          "name": "makeSaleSnapshot",
+          "params": [],
+          "returnType": "SaleSnapshot",
+          "exported": false,
+          "lineCount": 6
+        },
+        {
+          "name": "stubAuth",
+          "params": [
+            "req",
+            "_res",
+            "next"
+          ],
+          "exported": false,
+          "lineCount": 4
+        },
+        {
+          "name": "makeContext",
+          "params": [
+            "overrides"
+          ],
+          "returnType": "ProductContext",
+          "exported": false,
+          "lineCount": 16
+        },
+        {
+          "name": "makeApp",
+          "params": [
+            "contextOverrides"
+          ],
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "makeAppNoUser",
+          "params": [
+            "contextOverrides"
+          ],
+          "exported": false,
+          "lineCount": 12
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "supertest",
+          "specifiers": [
+            "request"
+          ]
+        },
+        {
+          "source": "express",
+          "specifiers": [
+            "express",
+            "Request",
+            "RequestHandler"
+          ]
+        },
+        {
+          "source": "../../src/api/routes/products",
+          "specifiers": [
+            "makeProductRoutes"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "ProductContext",
+            "AuthedRequest",
+            "SaleSnapshot",
+            "Product"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 129,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tests/unit/purchaseService.test.ts": {
+      "filePath": "backend/tests/unit/purchaseService.test.ts",
+      "contentHash": "2b1d5e910b495f0090ceb04d8fb18e78d070cfacd73c6370ef42aea5c0682a32",
+      "functions": [
+        {
+          "name": "makeFakeQueue",
+          "params": [],
+          "returnType": "Queue & { sent: PurchaseMessage[] }",
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "makeFakeDdb",
+          "params": [
+            "purchases"
+          ],
+          "returnType": "Ddb",
+          "exported": false,
+          "lineCount": 26
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "ioredis-mock",
+          "specifiers": [
+            "RedisMock"
+          ]
+        },
+        {
+          "source": "ioredis",
+          "specifiers": [
+            "Redis"
+          ]
+        },
+        {
+          "source": "../../src/services/stockService",
+          "specifiers": [
+            "makeStockService"
+          ]
+        },
+        {
+          "source": "../../src/services/saleService",
+          "specifiers": [
+            "makeProductSaleService"
+          ]
+        },
+        {
+          "source": "../../src/services/purchaseService",
+          "specifiers": [
+            "makeProductPurchaseService"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "PurchaseRecord",
+            "PurchaseMessage",
+            "Ddb",
+            "Queue",
+            "Product",
+            "StockService"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 185,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tests/unit/saleService.test.ts": {
+      "filePath": "backend/tests/unit/saleService.test.ts",
+      "contentHash": "3be4e767f158d32d58f01a2437ede56cc133d9ba871a1938bc1c635528345d68",
+      "functions": [
+        {
+          "name": "mockStockSvc",
+          "params": [
+            "value"
+          ],
+          "returnType": "StockService",
+          "exported": false,
+          "lineCount": 8
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../src/services/saleService",
+          "specifiers": [
+            "computeStatus",
+            "makeProductSaleService"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "Product",
+            "StockService"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 113,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tests/unit/stockService.test.ts": {
+      "filePath": "backend/tests/unit/stockService.test.ts",
+      "contentHash": "1f4101d7654afefc04a251d95b011f82bf9c4dbcb8e905680ea67721a92b4f09",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "ioredis",
+          "specifiers": [
+            "Redis"
+          ]
+        },
+        {
+          "source": "ioredis-mock",
+          "specifiers": [
+            "RedisMock"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "StockService"
+          ]
+        },
+        {
+          "source": "../../src/services/stockService",
+          "specifiers": [
+            "makeStockService"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 108,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tests/unit/userService.test.ts": {
+      "filePath": "backend/tests/unit/userService.test.ts",
+      "contentHash": "d0a31238da5207c00e291b7fed27546c4bd3235ca02044ecde2c8fc4c90aedf4",
+      "functions": [
+        {
+          "name": "makeFakeDdb",
+          "params": [
+            "users"
+          ],
+          "returnType": "Ddb",
+          "exported": false,
+          "lineCount": 20
+        },
+        {
+          "name": "makeLogger",
+          "params": [],
+          "exported": false,
+          "lineCount": 3
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "bcryptjs",
+          "specifiers": [
+            "bcrypt"
+          ]
+        },
+        {
+          "source": "jsonwebtoken",
+          "specifiers": [
+            "jwt"
+          ]
+        },
+        {
+          "source": "../../src/services/userService",
+          "specifiers": [
+            "makeUserService"
+          ]
+        },
+        {
+          "source": "@/types",
+          "specifiers": [
+            "Ddb",
+            "UserRecord",
+            "Config"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 231,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tests/stress/generate-user.ts": {
+      "filePath": "backend/tests/stress/generate-user.ts",
+      "contentHash": "acd5dd4db978760de5593994277bec96d48e0e8a6ade7658c42098b1438d1191",
+      "functions": [
+        {
+          "name": "setUserId",
+          "params": [
+            "context",
+            "_events",
+            "done"
+          ],
+          "exported": false,
+          "lineCount": 4
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tests/stress/flash-sale.yml": {
+      "filePath": "backend/tests/stress/flash-sale.yml",
+      "contentHash": "34031652076ba04f4739eaad8648d50d450578c5fb7bd9d1af74e0787fefbe76",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 109,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tests/stress/verify-stress.ts": {
+      "filePath": "backend/tests/stress/verify-stress.ts",
+      "contentHash": "1eb72f70aeaeb40ed49914670fbc70a1f249302f142c02b1dc84401f31319c1e",
+      "functions": [
+        {
+          "name": "countDdbPurchases",
+          "params": [
+            "config",
+            "productId"
+          ],
+          "returnType": "Promise<number>",
+          "exported": false,
+          "lineCount": 26
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@aws-sdk/client-dynamodb",
+          "specifiers": [
+            "DynamoDBClient",
+            "ScanCommand"
+          ]
+        },
+        {
+          "source": "@aws-sdk/client-dynamodb",
+          "specifiers": [
+            "AttributeValue"
+          ]
+        },
+        {
+          "source": "../../src/config",
+          "specifiers": [
+            "loadConfig"
+          ]
+        },
+        {
+          "source": "../../src/adapters/redis",
+          "specifiers": [
+            "makeRedis"
+          ]
+        },
+        {
+          "source": "../../src/services/stockService",
+          "specifiers": [
+            "makeStockService"
+          ]
+        },
+        {
+          "source": "../../scripts/products",
+          "specifiers": [
+            "seedProducts"
+          ]
+        },
+        {
+          "source": "../../src/logger",
+          "specifiers": [
+            "logger"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 120,
+      "hasStructuralAnalysis": true
+    },
+    "backend/elasticmq.conf": {
+      "filePath": "backend/elasticmq.conf",
+      "contentHash": "2c011c9a18c337eb0df8394b34ee9069261b1c75893afc56160a09be60cab67b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 27,
+      "hasStructuralAnalysis": false
+    },
+    "backend/docker-compose.yml": {
+      "filePath": "backend/docker-compose.yml",
+      "contentHash": "36efd4bfa900477d7d1aeb30e93cfc0e518bfede406b536f45f50dc0dbdb571f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 39,
+      "hasStructuralAnalysis": true
+    },
+    "backend/.env.example": {
+      "filePath": "backend/.env.example",
+      "contentHash": "a367e9d233c18699d442637308eda9144e62f94b762ab3de4deb639150541811",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "backend/serverless.yml": {
+      "filePath": "backend/serverless.yml",
+      "contentHash": "5a7c75f4b0831e04d71fe7a1e0ba98f682070a60a4f07022776597a035439379",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 159,
+      "hasStructuralAnalysis": true
+    },
+    "backend/.eslintrc.json": {
+      "filePath": "backend/.eslintrc.json",
+      "contentHash": "4130565d03ce747dff7b32509ef64a6432b015a7553643d540f7c6c6aa2664b8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 20,
+      "hasStructuralAnalysis": true
+    },
+    "backend/package-lock.json": {
+      "filePath": "backend/package-lock.json",
+      "contentHash": "015816702d873069b48fdca06a78693d80b28e2d5a9590e1b9d6d4e6b813d85d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25028,
+      "hasStructuralAnalysis": true
+    },
+    "backend/package.json": {
+      "filePath": "backend/package.json",
+      "contentHash": "eff95a513aa7eedaddc51d8ea865f5111d763c04c6d5b1b31c5699ed5a2c2baa",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 102,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tsconfig.json": {
+      "filePath": "backend/tsconfig.json",
+      "contentHash": "4d23c60afaf5cbb55fdc74b2b35fca6c264a387d1b2f369af74e78cce65404c6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 27,
+      "hasStructuralAnalysis": true
+    },
+    "backend/tsup.config.ts": {
+      "filePath": "backend/tsup.config.ts",
+      "contentHash": "a84e7a33f3e26b24c3c0d4eaf01503b00a4c00de044900af63dbfebe202aaecf",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "tsup",
+          "specifiers": [
+            "defineConfig"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    },
+    "docs/architecture.md": {
+      "filePath": "docs/architecture.md",
+      "contentHash": "67d47a403ab07955860729a10128f6db2c49e9634d23429a86621b7336761199",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 361,
+      "hasStructuralAnalysis": true
+    },
+    ".github/workflows/FullTest.yml": {
+      "filePath": ".github/workflows/FullTest.yml",
+      "contentHash": "bbb7e6c2fc08e51b346d8b5a514920b1e0d12efc9c84a1c31ff8e39fb6926b4e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 90,
+      "hasStructuralAnalysis": true
+    },
+    ".github/workflows/StressTest.yml": {
+      "filePath": ".github/workflows/StressTest.yml",
+      "contentHash": "007e785a374645e9dd7cf62910024ff3dd4dba8241e4e4becea7c61084e2ee46",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 94,
+      "hasStructuralAnalysis": true
+    },
+    ".gitignore": {
+      "filePath": ".gitignore",
+      "contentHash": "f422e96250dbad58f6d658bd084c1fb2a9b3ddf4605a3a518fafa5096c1d273f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3,
+      "hasStructuralAnalysis": false
+    },
+    ".nvmrc": {
+      "filePath": ".nvmrc",
+      "contentHash": "f14b4987904bcb5814e4459a057ed4d20f58a633152288a761214dcd28780b56",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": false
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "1da7393e8ebf2a83f8d1be6c7e496b9b7a8850c12b35a63aa5d9c53ad06b82b1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 186,
+      "hasStructuralAnalysis": true
+    },
+    ".claude/settings.local.json": {
+      "filePath": ".claude/settings.local.json",
+      "contentHash": "b735264ef0db0ddabe1b51c6199ab16fd1e9c08729605a89832a5713b5dd0785",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    }
+  }
+}

@@ -15,7 +15,6 @@ import { makeQueue } from "../adapters/queue";
 import { makeRedis } from "../adapters/redis";
 import { loadConfig } from "../config";
 import logger from "../logger";
-import { mockProducts } from "../products";
 import { makeProductPurchaseService } from "../services/purchaseService";
 import { makeProductSaleService } from "../services/saleService";
 import { makeStockService } from "../services/stockService";
@@ -24,18 +23,29 @@ import { makeAuthMiddleware } from "./middleware/auth";
 import { makeAuthRoutes } from "./routes/auth";
 import { makeProductRoutes } from "./routes/products";
 
-export function buildApp(
+export async function buildApp(
   opts: {
     config?: Config;
     deps?: AppDeps;
     products?: Product[];
   } = {},
-): AppWithDeps {
+): Promise<AppWithDeps> {
   const config = opts.config ?? loadConfig();
   const redis = opts.deps?.redis ?? makeRedis({ config, logger });
   const ddb = opts.deps?.ddb ?? makeDdb({ config, logger });
   const queue = opts.deps?.queue ?? makeQueue({ config, logger });
-  const products = opts.products ?? mockProducts;
+
+  const products: Product[] = opts.products ?? (await ddb.listProducts()).map((r) => ({
+    id: r.productId,
+    name: r.name,
+    description: r.description,
+    emoji: r.emoji,
+    price: r.price,
+    originalPrice: r.originalPrice,
+    stock: r.stock,
+    saleStart: r.saleStart,
+    saleEnd: r.saleEnd,
+  }));
 
   const productServices = new Map<string, ProductContext>();
   for (const product of products) {

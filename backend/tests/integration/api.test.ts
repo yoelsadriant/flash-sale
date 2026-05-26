@@ -85,7 +85,7 @@ describe('API integration', () => {
     redis = new RedisMock() as unknown as Redis;
     ddb   = makeFakeDdb();
     queue = makeFakeQueue();
-    app   = buildApp({ config, deps: { redis, ddb, queue }, products: [TEST_PRODUCT, UPCOMING_PRODUCT] });
+    app   = await buildApp({ config, deps: { redis, ddb, queue }, products: [TEST_PRODUCT, UPCOMING_PRODUCT] });
     // reset() sets stock AND clears the buyers set — prevents state leaking between tests
     await makeStockService({ redis, saleId: TEST_PRODUCT.id }).reset(5);
     await makeStockService({ redis, saleId: UPCOMING_PRODUCT.id }).reset(5);

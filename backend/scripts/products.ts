@@ -1,4 +1,4 @@
-import { Product } from '@/types';
+import { Product } from '../src/types';
 
 function ts(offsetMs: number): string {
   return new Date(Date.now() + offsetMs).toISOString();
@@ -7,14 +7,7 @@ function ts(offsetMs: number): string {
 const h = (n: number) => n * 60 * 60 * 1000;
 const m = (n: number) => n * 60 * 1000;
 
-/**
- * Four products covering every possible sale state so the UI can demonstrate
- * upcoming / active / ended / sold_out at the same time.
- *
- * Times are computed relative to server startup so the states are always
- * correct regardless of when you run the project.
- */
-export const mockProducts: Product[] = [
+export const seedProducts: Product[] = [
   {
     id: 'dcbad1c7-7443-4b60-ae42-41801d2da89c',
     name: 'Sony WH-1000XM6',

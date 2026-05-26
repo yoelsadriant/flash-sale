@@ -16,7 +16,7 @@ import { loadConfig } from '../src/config';
 import { makeRedis } from '../src/adapters/redis';
 import { makeDdb } from '../src/adapters/ddb';
 import { makeStockService } from '../src/services/stockService';
-import { mockProducts } from '../src/products';
+import { seedProducts } from './products';
 import logger from '../src/logger';
 
 function purchasesTableSpec(tableName: string): CreateTableCommandInput {
@@ -135,14 +135,14 @@ async function main() {
 
   // 2. Seed product catalog into DDB (idempotent — won't overwrite existing)
   const ddb = makeDdb({ config, logger });
-  for (const product of mockProducts) {
+  for (const product of seedProducts) {
     await ddb.putProduct(product, { overwrite: false });
     logger.info({ productId: product.id }, 'bootstrap.product.seeded');
   }
 
   // 3. Redis stock counters (idempotent — NX, won't clobber live stock)
   const redis = makeRedis({ config, logger });
-  for (const product of mockProducts) {
+  for (const product of seedProducts) {
     const stockService = makeStockService({ redis, saleId: product.id });
     const wasSet = await stockService.initialize(product.stock);
     logger.info({ wasSet, stock: product.stock, productId: product.id }, 'bootstrap.stock.initialize');

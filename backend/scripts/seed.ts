@@ -13,8 +13,9 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { loadConfig } from '../src/config';
 import { makeRedis } from '../src/adapters/redis';
+import { makeDdb } from '../src/adapters/ddb';
 import { makeStockService } from '../src/services/stockService';
-import { mockProducts } from '../src/products';
+import { seedProducts } from './products';
 import logger from '../src/logger';
 
 async function clearPurchases(config: ReturnType<typeof loadConfig>) {
@@ -54,7 +55,7 @@ async function clearPurchases(config: ReturnType<typeof loadConfig>) {
   const redis = makeRedis({ config, logger });
   const reset = process.argv.includes('--reset');
 
-  for (const product of mockProducts) {
+  for (const product of seedProducts) {
     const stockService = makeStockService({ redis, saleId: product.id });
     if (reset) {
       await stockService.reset(product.stock);
@@ -67,6 +68,11 @@ async function clearPurchases(config: ReturnType<typeof loadConfig>) {
 
   if (reset) {
     await clearPurchases(config);
+    const ddb = makeDdb({ config, logger });
+    for (const product of seedProducts) {
+      await ddb.putProduct(product, { overwrite: true });
+      logger.info({ productId: product.id }, 'seed.product.reset');
+    }
   }
 
   await redis.quit();
